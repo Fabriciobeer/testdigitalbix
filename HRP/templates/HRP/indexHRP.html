@@ -1,0 +1,53 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/index.css' %}">
+{% endblock %}
+
+{% block base-content %}
+<div class="timesheet row">
+    {% if request.user.is_manager or request.user.is_RH %}
+        <div class ="col-lg-4 col-left">
+            <h2 class="table-title"> Colaboradores </h2>
+            <div class = "image-container">
+                <a class="index-options" href="/HRP/controle">
+                    <img name="HRPcontrolimg" class = "index-img HRPcontrolimg entrada" src = "{% static 'imgs/HRPcontrol0.png' %}">
+                    <img name="HRPcontrolimg" class = "index-img HRPcontrolimg saida d-none" src = "{% static 'imgs/HRPcontrol1.png' %}">
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class ="col-lg-4 col-left">
+            <h2 class="table-title"> Perfil </h2>
+            <div class = "image-container">
+                <a class="index-options" href="/HRP/perfil/{{request.user.colaborador.id}}/">
+                    <img name="profileimg" class = "index-img profileimg entrada" src = "{% static 'imgs/profile0.png' %}">
+                    <img name="profileimg" class = "index-img d-none profileimg saida" src = "{% static 'imgs/profile1.png' %}">
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    <div class ="col-lg-4 col-center">
+        <h2 class="table-title"> Timesheet </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/HRP/timesheet">
+                <img name="timesheetimg" class = "index-img timesheetimg entrada" src = "{% static 'imgs/timesheet0.png' %}">
+                <img name="timesheetimg" class = "index-img d-none timesheetimg saida" src = "{% static 'imgs/timesheet1.png' %}">
+            </a>
+        </div>
+    </div>
+    <div class ="col-lg-4 col-right">
+        <h2 class="table-title"> Alocação </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/HRP/allocation">
+                <img name="allocationimg" class = "index-img allocationimg entrada" src = "{% static 'imgs/allocation.png' %}">
+                <img name="allocationimg" class = "index-img d-none allocationimg saida" src = "{% static 'imgs/allocation-hover.png' %}">
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

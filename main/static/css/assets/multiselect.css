@@ -1,0 +1,76 @@
+.wrapper{
+  overflow: visible;
+}
+
+
+.custom-multiselect {
+  width: 110px;
+}
+
+.selectBox {
+  position: relative;
+  top: 41px;
+}
+
+.select-multiselect{
+  width: 100%;
+  display: block;
+  color: #999;
+  font-size: 18px;
+  font-weight: normal;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  background-color: transparent;
+}
+
+.multiselect-collapsed{
+  color: #3299BB !important;
+  border-bottom: 1px solid #3299BB !important;
+}
+
+.selectWrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.selectOptions-wrapper{
+  width: inherit;
+  position: relative;
+  top:40px;
+}
+
+#selectOptions {
+  width: 100%;
+  position: absolute;
+  display: none;
+  border: 1px #dddddd solid;
+  box-shadow: 0 0 12px 0 rgba(0,0,0,.12)
+}
+
+#selectOptions label {
+  display: block;
+}
+
+#selectOptions label:hover {
+  background-color: #3299BB;
+  color: #fff;
+}
+
+input[type="checkbox" i] {
+  position: absolute;
+    right: 0;
+}
+
+.singleOption{
+  position: relative;
+  margin-bottom: 0px;
+}
+
+.singleOption input{
+  position: absolute;
+  top:7px;
+  right: 3px;
+}

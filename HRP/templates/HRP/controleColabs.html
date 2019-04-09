@@ -1,0 +1,206 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/controle.css' %}">
+<link rel="stylesheet" href="{% static 'css/assets/multiselect.css' %}">
+{% endblock %}
+
+{% block base-content %}
+
+<div class="wrapper">
+
+    <div class = "table-container" id="novo_colaborador">
+        <h2 class="table-title"> Novo Colaborador </h2>
+        <form class="form-novo" action="/HRP/controle/add_colab/" method="post">
+        {% csrf_token %}
+        <div class="grid-container" id="t-grid">
+            <div class="custom-multiselect">
+                <div class="selectBox" onclick="showCheckboxes()">
+                    <select class="select-multiselect">
+                        <option>Permissões</option>
+                    </select>
+                    <div class="selectWrapper"></div>
+                </div>
+                <div class="selectOptions-wrapper">
+                    <div id="selectOptions">
+                        <label class="singleOption">Executor
+                            <input name='is_executor' class="singleOptionInput" type="checkbox" checked="checked">
+                        </label>
+                        <label class="singleOption">RH
+                            <input name='is_RH' class="singleOptionInput" type="checkbox">
+                        </label>
+                        <label class="singleOption">Financeiro
+                            <input name='is_financeiro'class="singleOptionInput" type="checkbox">
+                        </label>
+                        <label class="singleOption">Gerente
+                            <input name='is_manager' class="singleOptionInput" type="checkbox">
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="field"  id="nome">
+                <input name="nome" type="text" required>
+                <label>Nome</label>
+            </div>
+            <div class="field">
+                <select name = "modelo-contrato" id="cargo" onchange="change_span_html();" required>
+                        <option value='' selected hidden></option>
+                        {% for modelo_contrato in modelo_contratos %}
+                        <option value='{{ modelo_contrato.id }}' > {{ modelo_contrato.modalidade }} - {{ modelo_contrato.carga_horaria }}h </option>
+                        {% endfor %}
+                </select>
+                <label>Contrato</label>    
+                <span class="select-value" id="span-cargo"></span>
+            </div>
+            <div class="field"  id="email">
+                <input name="email" type="text" required>
+                <label>E-mail</label>
+            </div>
+        </div>
+        <button type="submit" id="btn-novo" class="btn padrao-btn">Enviar</button>
+        </form>
+    </div>
+
+    {% if colab_readmitido %}
+    <div class = "table-container" id="tabela-inativos">
+        <h2 class="table-title"> Selecione o Contrato do Colaborador Readmitdo </h2>
+        
+        <div class="table-responsive">
+            <table class="table table-striped">      
+                
+                <tbody class="">
+                    <tr>
+                        <th class="th-nome">Nome</th>
+                        <th class="th-contrato">Contrato</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                    <tr>
+                    <form action="/HRP/controle/restaura_contrato/?pk={{colab_readmitido.id}}" method="post" id="form{{colab_readmitido.id}}">
+                        {% csrf_token %}
+                        <td> <input type="text" name="nome" value="{{colab_readmitido.colaborador.nome}}"> </td>
+                        <td> 
+                            <select name = "modelo-contrato">
+                                    {% for modelo_contrato in modelo_contratos %}
+                                    <option value='{{ modelo_contrato.id }}' > {{ modelo_contrato.modalidade }} - {{ modelo_contrato.carga_horaria }}h </option>
+                                    {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <button type="submit" form="form{{colab_readmitido.id}}" class="btn">{% octicon 'check' class='octicon'%}</button>
+                        </td>
+                    </form>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class = "table-container" id="colaboradores_atuais">
+        <h2 class="table-title"> Colaboradores Atuais </h2>
+        <div class="table-responsive">
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th class="th-nome">Nome</th>
+                        <th class="th-contrato">Contrato</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    {% for contrato in contratos %}
+                    
+                    <tr>
+                        <form id ="form{{contrato.id}}" action="/HRP/controle/edit_contrato/?pk={{contrato.id}}" method="post">
+                            {% csrf_token %}
+                            <td> <input type="text" name="nome" value="{{contrato.colaborador.nome}}"> </td>
+                            <td> 
+                                <select name = "modelo-contrato">
+                                    {% for modelo_contrato in modelo_contratos %}
+                                    <option value='{{ modelo_contrato.id }}' {% if contrato.modelo.id == modelo_contrato.id %} selected {% endif %} > {{ modelo_contrato.modalidade }} - {{ modelo_contrato.carga_horaria }}h </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <a href="/HRP/perfil/{{contrato.colaborador.id}}" style="position: relative;top: 2px">{% octicon 'pencil' class='octicon'%}</span></a>
+                                <button type="submit" form="form{{contrato.id}}" style="margin-bottom: 3px"class="btn">{% octicon 'cloud-upload' class='octicon' %}</button>
+                                <a href="/HRP/controle/finalizar_contrato/?pk={{contrato.id}}" style="position: relative;top: 3px">{% octicon 'remove' class='octicon'%}</span></a>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <a href="/HRP/controle/inativos" class="btn padrao-btn">Inativos</a>
+</div>
+{% endblock %}
+
+{% block childscript %}
+    window.onload = function(){
+        {% if errorlog %}
+            alert("{{errorlog}}");
+        {% endif %}
+    };
+    $('#is-manager').change(function(){
+        $('#is-manager-div').toggleClass('placeholder');
+        $('#is-manager-div').toggleClass('checked');
+    });
+
+    $(".octicon").mouseenter(function(e){
+        $(this).toggleClass("octicon-blue");
+    });
+    $(".octicon").mouseleave(function(e){
+        $(this).toggleClass("octicon-blue");
+    });
+
+    select_valid_flag = true;
+    function change_span_html(){
+
+       
+        if (select_valid_flag){
+            $("#cargo").addClass("valid");
+            select_valid_flag = false;
+        }
+        //setTimeout(function(){
+        $('.select-value#span-cargo').html($('#cargo option:selected').text());
+        //}, 70);
+        
+    }
+
+    var expanded = false;
+    var options = document.getElementById("selectOptions");
+    var select = $('.select-multiselect');
+    
+
+    document.addEventListener("click", function(event) {
+
+        // If user clicks inside the element, do nothing
+        if(event.target.classList[0] == "selectWrapper"){
+            select.toggleClass('multiselect-collapsed');
+            if (!expanded) {
+                options.style.display = "block";
+                expanded = true;
+            } else {
+                options.style.display = "none";
+                expanded = false;
+            }
+        }else if(event.target.classList[0] == "singleOption" || event.target.classList[0] == "singleOptionInput"){
+            return;
+        }else if (expanded) {
+            select.toggleClass('multiselect-collapsed');
+            options.style.display = "none";
+            expanded = false;
+        }
+        console.log(event.target.classList)
+
+
+    });
+    
+
+{% endblock %}

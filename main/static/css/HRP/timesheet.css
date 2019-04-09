@@ -1,0 +1,197 @@
+/* Organização da tela */
+    #datepicker{
+        padding-left: calc(95% - 272px);
+        padding-top: 60px;
+    }
+    .col-md-5{
+        padding: 0px 0px 0px 0px;
+    }
+    .col-md-7{
+        padding: 0px 0px 0px 0px;
+    }
+
+    #dados-timesheet{
+        padding-left: 2.08%;
+        padding-top: 60px;
+        padding-right: calc(41.66667% - 287px);
+    }
+
+/* Estilização do Formulário */
+
+    /* Selects */
+        /* Poscicionamento */
+        select{
+            margin-bottom: 5px;
+            height: 30px;
+        }
+
+        #empresa{
+            float: left;
+            width: 48%;
+        }
+
+        #area{
+            float: right;
+            width: 48%;
+        }
+        #atividade{
+            width: 100%;
+        }
+    /* Campos de Texto */
+        /* Estilização */
+        .placeholder{
+            color:grey;
+            font-weight: 500;
+        }
+
+        option{
+            color: black;
+        }
+
+    /* Campos de Texto*/
+        /* Poscicionamento */
+        input{
+            margin-bottom: 5px;
+            padding-left: 2.5px;
+        }
+
+        input[type="text"], textarea{
+            width: 100%;
+        }
+
+        textarea{
+            height: 108px;
+            padding-left: 2.5px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* --- */
+        input[type="number"]{
+            width: 16%;
+        }
+
+        #horas{
+            float: left;
+            text-align: right;
+            padding-right: 2.5px;
+        }
+
+        #minutos{
+            float: center;
+        }
+
+        input[type='number'] {
+            -moz-appearance:textfield;
+        }
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        #separador-hora-min{
+            position: relative;
+            left: 2px;
+            display: inline;
+        }
+
+        /* --- */
+        .btn{
+            height: 30px;
+            margin-bottom: 0px;
+            padding: 0px 0px;
+            background-color: #33323d;
+            color: white;
+            font-weight: 600;
+        }
+        .btn:hover{
+            background-color: #3146F2;
+            color: white;
+        }
+        #enviar{
+            float: right;
+            width: 62%;
+        }
+        #btn-registro{
+            width: 100%;
+        }
+        /* Estilização */
+        input::placeholder, textarea::placeholder{
+            font-weight: 500;
+        }
+/* DatePicker */
+
+    
+    .ui-datepicker {
+        margin: 0px;
+        padding: 0px !important;
+        border: 3px solid #33323d !important;
+    }
+
+    .ui-datepicker-title{
+        
+        color: white;
+    }
+
+    .ui-datepicker-header{
+        background-color: #33323d !important;
+        border: 3px solid #33323d !important;
+        border-bottom-right-radius: 0px !important;
+        border-bottom-left-radius: 0px !important;
+        border-top-right-radius: 0px !important;
+        border-top-left-radius: 0px !important;
+        position: relative;
+        bottom: 1px;
+    }
+
+    .ui-state-active{
+        border: 1px solid #c5c5c5 !important;
+        background: #f6f6f6 !important;
+        font-weight: normal !important;
+        color: #454545 !important;
+    }
+
+    td.ui-dia-selecionado a{
+        border: 1px solid #c5c5c5 !important;
+        background: #33323d !important;
+        color: white !important;
+    }
+
+    .ui-dia-selecionado{
+        border: 0px solid #c5c5c5 !important;
+        
+    }
+
+    
+    /** Still working on it 
+    .ui-datepicker-today .ui-state-highlight {
+        border: 1px solid #89f2f2 !important;
+        background: #89f2f2  !important;
+        color: #33323d !important;
+    }
+    **/
+
+@media screen and (max-width: 768px) {
+    #titulo {
+        display: none;
+    }
+    
+    #datepicker{
+        padding-left: 0px;
+        padding-top: 30px;
+    }
+    .ui-datepicker {
+        margin: 0px auto 0;
+        padding: 0px !important;
+        border: 3px solid #33323d !important;
+    }
+    #dados-timesheet{
+        padding: 30px 30px 0px 30px;
+    }
+    .col    
+}
+
+select{
+    background-color: white !important;
+}

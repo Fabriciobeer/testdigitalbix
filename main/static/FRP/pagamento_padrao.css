@@ -1,0 +1,136 @@
+.wrapper_all{
+    margin-top: 100px;
+}
+
+.wrapper_empresa{
+    margin: 0px 15%;
+    margin-bottom: 50px;
+}
+
+.grid_wrapper{
+    display: grid;
+    grid-template-columns: auto auto auto 30px;
+    grid-column-gap: 30px;
+    grid-row-gap: 30px;
+}
+
+.grid_add_save_btn{
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-column-gap: 20px;
+}
+.empresa_title{
+    margin-top: 30px;
+    display: inline-block;
+    color: #33323d;
+    border-bottom: 2px solid #3b49ee;
+    margin-bottom: .5rem;
+    font-family: inherit;
+    line-height: 1.2;
+    display: table;
+    padding: 0px 10px 0px 10px;
+    font-weight: 400;
+    margin-top: 30px;
+}
+.cnpj_title{
+    margin-top: 30px;
+    display: inline-block;
+    color: #33323d;
+    border-bottom: 2px solid #3b49ee;
+    margin-bottom: .5rem;
+    font-family: inherit;
+    line-height: 1.2;
+    font-size: 1.5em;
+    display: table;
+    padding: 0px 10px 0px 10px;
+    font-weight: 400;
+    margin-top: 30px;
+}
+.empresa_title:hover{
+    cursor: pointer;
+    border-bottom: 2px solid #89f2f2;
+}
+.cnpj_title:hover{
+    cursor: pointer;
+    border-bottom: 2px solid #89f2f2;
+}
+.btn_remove_save{
+    align-self: center;
+    font-size: 22px;
+}
+
+.my_btn{
+    height: 30px;
+    margin-bottom: 0px;
+    padding: 0px 0px;
+    background-color: #33323d;
+    color: white;
+    font-weight: 600;
+    width: 20%;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s;
+    border: none;
+}
+
+.my_btn:hover{
+    background-color: #3b49ee;
+}
+
+.btn_remove_save{
+    text-decoration:none;
+    width: 30px;
+}
+
+.btn_submit{
+    justify-self: end;
+}
+
+.btn_add{
+    line-height: 25px;
+    font-size: 20px;
+}
+label{
+    display: block;
+    color:#999; 
+    font-size:18px;
+    font-weight:normal;
+    position: relative;
+    pointer-events:none;
+    top: 40px;
+    transition:0.2s ease all; 
+    -moz-transition:0.2s ease all; 
+    -webkit-transition:0.2s ease all;
+}
+
+input:focus ~ label, input:valid ~ label{
+    top:10px;
+    font-size:14px;
+    color:#5264AE;
+}
+
+option{
+    color: black;
+}
+
+.field{
+    text-align: -webkit-center;
+    display: flex;
+    flex-flow: column-reverse;
+}
+  @-webkit-keyframes inputHighlighter {
+	from { background:#5264AE; }
+  to 	{ width:0; background:transparent; }
+}
+
+@-moz-keyframes inputHighlighter {
+	from { background:#5264AE; }
+  to 	{ width:0; background:transparent; }
+}
+
+@keyframes inputHighlighter {
+	from { background:#5264AE; }
+  to 	{ width:0; background:transparent; }
+}

@@ -1,0 +1,250 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/controle.css' %}">
+{% endblock %}
+
+{% block base-content %}
+
+<div class="wrapper wrapper-timesheet">
+        <div class="table-container" style="width: 100%">
+            <div class="title-wrapper-timesheet-l">
+                <h2  class="table-title table-title-timesheet"   > A partir de: </h2>
+                <form id="timedelta-form" method="POST">
+                {% csrf_token %}
+                    <select class="select-registro" name="filtro_data" onchange="submit_form();" style="width: 100%;">
+                        <option value=7 {% if timedelta == 7 %} selected {% endif %}>Últimos 7 dias</option>
+                        <option value=30 {% if timedelta == 30 %} selected {% endif %}>Últimos 30 dias</option>
+                        <option value=90 {% if timedelta == 90 %} selected {% endif %}>Último trimestre</option>
+                        <option value=365 {% if timedelta == 365 %} selected {% endif %}>Último ano</option>
+                        <option value=0 {% if timedelta == 0 %} selected {% endif %}>Todas</option>
+                    </select>
+                </form>
+            </div>
+            <div class="title-wrapper-timesheet-r">
+                <h2  class="table-title table-title-timesheet" > Ação: </h2>
+                <form id="acao-form" method="POST">
+                {% csrf_token %}
+                    <select class="select-registro" id="acao-form-val" name="acao" style="width: 100%;">
+                        <option value="del">Deletar</option>
+                        <option value="rep">Gerar Relatório</option>
+                    </select>
+                    <button type="submit" form="" onclick="submit_acao()" class="btn" id="btn-timesheet">Enviar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Essa form está aqui, porque o HTML não permite nested forms. Então, cada vez que o checkbox da form de cada linha mudar, seu valor será atualizado nesta form-->
+        <form id="sel-horas" method="POST" action="#">
+            {% csrf_token %}
+            {% for hora in horas_registradas %}
+            <input class="checkbox-registro" onchange="checkbox_change({{hora.id}})" id="checkbox{{hora.id}}" name="selected-{{hora.id}}" type="checkbox" hidden>
+            {% endfor %}
+        </form>
+
+    {% if horas_registradas %}
+    <div class = "table-container table-container-timesheet" id="colaboradores_atuais">
+        <div class="table-responsive">
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th class="th-data">Data</th>
+                        <th class="th-nome">Empresa</th>
+                        <th class="th-nome">Área</th>
+                        <th class="th-nome">Projeto</th>
+                        <th class="th-nome">Horas</th>
+                        <th class="th-nome">Comentário</th>
+                        <th  class="th-acoes">Sel - Del</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                        {% for hora in horas_registradas %}
+                        <tr> 
+                            <form id ="form{{hora.id}}" action="/HRP/timesheet/edit_hora/?pk={{hora.id}}&timedelta={{timedelta}}" onsubmit="return validate_form('{{hora.id}}')" method="post">
+                                {% csrf_token %}
+                                <td class="td-inativo"> 
+                                    {{hora.data_execucao}}
+                                </td>
+                                <td class="td-inativo">
+                                    {% if hora.area.empresa.id == 0 %}
+                                        {{hora.area.empresa.nome}}
+                                    {% else %}
+                                        <select name="empresa" id="empresa{{hora.id}}" onchange="empresa_change(this, '{{hora.id}}');">
+                                                <option value="" disabled style="color:grey;">Empresa</option>
+                                                {% for empresa in empresas %}
+                                                <option  value="{{empresa.1}}" {% if empresa.1 == hora.area.empresa.id %} selected {% endif %}> {{empresa.0}} </option>
+                                                {% endfor %}
+                                            
+                                        </select>
+                                    {% endif %}
+                                </td>
+                                <td class="td-inativo">
+                                    {% if hora.area.empresa.id == 0 %}
+                                        {{hora.area.nome}}
+                                    {% else %}
+                                        <select name = "area" id="area{{hora.id}}">
+                                            {% for empresa_aux in areas.items %}
+                                                {% if empresa_aux.0 == hora.area.empresa.id %}
+                                                    <option value="" disabled style="color:grey;">Área</option>
+                                                    {% for area_aux in empresa_aux.1 %}
+                                                        <option value="{{area_aux.id}}" {% if area_aux == hora.area %} selected {% endif %}>{{area_aux.nome}}</option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
+                                </td>
+                                <td class="td-inativo">
+                                    <select name = "projeto" id="projeto{{hora.id}}">
+                                        {% for empresa_aux in projetos.items %}
+                                            {{hora.projeto.empresa.id}}{{empresa_aux.0}}
+                                            {% if empresa_aux.0 == hora.projeto.empresa.id %}
+                                                <option value="" disabled style="color:grey;">Área</option>
+                                                {% for projeto_aux in empresa_aux.1 %}
+                                                    <option value="{{projeto_aux.id}}" {% if projeto_aux == hora.projeto %} selected {% endif %}>{{projeto_aux.descricao}}</option>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td class="td-inativo"> 
+                                    <input lang="en-150" step=".01" min="0.01" type="number" id="tempo{{hora.id}}" name="horas" value="{{hora.hora|floatformat:2}}">
+                                </td>
+                                <td class="td-inativo"> 
+                                    <input type="textarea" name="comentario" value="{{hora.comentario}}">
+                                </td>
+                                <td>
+                                    <div class="td-acoes">
+                                        <div class = "wrapper-acao-3obj">
+                                            <input class="checkbox-registro" onchange="checkbox_change({{hora.id}})" type="checkbox">
+                                        </div>
+                                        <div class = "wrapper-acao-3obj" style="position: relative; left: 6.5px; top: 0px;">
+                                            <a class="del-registro" href="/HRP/timesheet/del_hora/?pk={{hora.id}}&timedelta={{timedelta}}">{% octicon 'remove' class='octicon' %}</span></a>
+                                        </div>
+                                        <div class = "wrapper-acao-3obj" style="position: relative; bottom: 2px;"> 
+                                            <button type="submit" form="form{{hora.id}}" class="btn">{% octicon 'cloud-upload' class='octicon' %}</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class = "table-container">
+        <h2 class="table-title" > Nenhuma hora foi registrada como executada nos últimos {{timedelta}} dias </h2>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block childscript %}
+
+$(".octicon").mouseenter(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+$(".octicon").mouseleave(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+
+function submit_form(){
+    $("#timedelta-form").submit();
+}
+
+function submit_acao(){
+    var acao = $("#acao-form-val").val();
+
+    if(acao == 'del'){
+        $('#sel-horas').attr('action', '/HRP/timesheet/del_mass_horas/?timedelta={{timedelta}}');
+        $('#sel-horas').submit();
+    }else if(acao == 'rep'){
+        $('#sel-horas').attr('action', '/HRP/timesheet/generate_report/?timedelta={{timedelta}}');
+        $('#sel-horas').submit();
+    }
+}
+
+var areas_dict = {};
+{% for empresa,val in areas.items %}
+    areas_dict["{{empresa}}"] = [{% for area in val %} ["{{area.nome}}","{{area.id}}"] {{loop.last}}{% if not forloop.last %} , {%else%} {%endif%} {% endfor %}];
+{% endfor %}
+
+var projetos_dict = {};
+{% for empresa,val in projetos.items %}
+    projetos_dict["{{empresa}}"] = [{% for projeto in val %} ["{{projeto.descricao}}","{{projeto.id}}"] {{loop.last}}{% if not forloop.last %} , {%else%} {%endif%} {% endfor %}];
+{% endfor %}
+
+empresas_placeholder_flag = true;
+
+function empresa_change(selectObject, id_hora){
+
+    if (empresas_placeholder_flag){
+        $("#empresa"+id_hora).removeClass("placeholder");
+        empresas_placeholder_flag = false;
+    }
+
+// Renovando as opções de áreas
+    var areas_possiveis = areas_dict[selectObject.value];
+    var select = document.getElementById('area'+id_hora);
+    
+    select.options.length = 1
+    for(var i=1; i < areas_possiveis.length + 1;i++){
+        select.options[i] = new Option(areas_possiveis[i-1][0], areas_possiveis[i-1][1]);
+    }
+
+// Renovando as opções de áreas
+    var projetos_possiveis = projetos_dict[selectObject.value];
+    var select = document.getElementById('projeto'+id_hora);
+
+    select.options.length = 1
+    for(var i=1; i < projetos_possiveis.length + 1;i++){
+        select.options[i] = new Option(projetos_possiveis[i-1][0], projetos_possiveis[i-1][1]);
+    }
+}
+
+function validate_form(id){
+    var error_log = 'Erros: \n';
+    var valid = true;
+
+    if ($('#empresa'+id).val() == '0'){
+        if ($('#area'+id).val() == ''){
+            error_log += "- Selecione uma área \n";
+            valid = false
+        }
+        if (! valid){
+            alert(error_log)
+        }
+        return valid;
+    }else if ($('#empresa'+id).val() == ''){
+        error_log += "- Selecione uma empresa \n";
+        valid = false
+    }
+    if ($('#area'+id).val() == null || $('#area'+id).val() == ""){
+        error_log += "- Selecione uma área \n";
+        valid = false
+    }
+    if($('#projeto'+id).val() == null || $('#projeto'+id).val() == ""){
+        error_log += "- Selecione um projeto \n"
+        valid = false;
+    }
+
+    if (! valid){
+        alert(error_log)
+    }
+    return valid;
+}
+
+function checkbox_change(id){
+    var checkBox = $("#checkbox"+id); 
+    checkBox.prop("checked", !checkBox.prop("checked"));
+}
+
+{% endblock %}

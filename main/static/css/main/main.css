@@ -1,0 +1,270 @@
+html{
+    min-width: 360px;
+}
+/*
+For using a background image
+
+body { 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+*/
+
+
+
+
+/* Timsheet 
+
+
+}
+
+-------- */
+/* Inputs */ 
+
+textarea:focus, input:focus, select:focus{
+    outline-color: transparent;
+}
+
+.field input, .field select{
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.select-value{
+    position: relative;
+    height: 0;
+    top: 42px; 
+    z-index: -1;
+}
+
+.field select {
+    height: 35px;
+    color: transparent;
+    background-color: transparent;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+
+.field input:hover, .field select:hover{
+    background: rgba(23, 22, 36, 0.089);
+    outline: none;
+}
+
+.field input:focus, .field select:focus{
+    background: none;
+    outline: none;
+    border-bottom:1px solid #3299BB;
+}
+
+.field label{
+    display: block;
+    color:#999; 
+    font-size:18px;
+    height: 28px;
+    font-weight:normal;
+    position: relative;
+    pointer-events:none;
+    top: 40px;
+    margin-bottom: .5rem;
+    transition:0.2s ease all; 
+    -moz-transition:0.2s ease all; 
+    -webkit-transition:0.2s ease all;
+}
+.field input:focus ~ label,.field input:valid ~ label, .field .valid ~ label{
+    top:10px;
+    font-size:14px;
+    color:#5264AE;
+  }
+
+@-webkit-keyframes inputHighlighter {
+	from { background:#5264AE; }
+  to 	{ width:0; background:transparent; }
+}
+@-moz-keyframes inputHighlighter {
+	from { background:#5264AE; }
+  to 	{ width:0; background:transparent; }
+}
+@keyframes inputHighlighter {
+	from { background:#5264AE; }
+  to 	{ width:0; background:transparent; }
+}
+
+.octicon-blue{
+    fill: #3146F2 !important;
+}
+
+.row{
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+#hamburguer{
+    color: white;
+    position: relative;
+    right: -16px;
+    top: -6.5px;
+    font-size: 2.5em;
+    cursor: pointer;
+    transition:0.5s ease all; 
+    -moz-transition:0.5s ease all; 
+    -webkit-transition:0.5s ease all;
+}
+
+#hamburguer:hover{
+    color: #89f2f2;
+}
+
+.hamb-clicked{
+    color: #3b49ee !important;
+}
+
+.header-right{
+    vertical-align: middle;
+    line-height: 83.06px;
+}
+
+/* Acordion Menu */
+
+h1 {
+  color: #FFF;
+  font-size: 24px;
+  font-weight: 400;
+  text-align: center;
+  margin-top: 80px;
+}
+
+h1 a {
+  color: #c12c42;
+  font-size: 16px;
+}
+
+.accordion {
+  position: absolute;
+  right: 0px;
+  z-index: 1000;
+  width: 100%;
+  max-width: 220px;
+  background: #F9F9F9;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  overflow: hidden
+}
+
+.accordion{
+  transition:0.2s ease all; 
+  -moz-transition:0.2s ease all; 
+  -webkit-transition:0.2s ease all;
+  -o-transition:height 0.2s ease-all;
+  height: 0px;
+}
+
+@media screen and (max-width: 890px) {
+    #hamburguer{
+        top:auto;
+        right: auto;
+    }
+    .accordion{
+        right: calc(50% - 110px);
+    }
+}
+
+
+.show_accordion{
+  height: 210px;
+}
+
+.open_accordion{
+  height: auto;    
+}
+
+ul{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#accordion a{
+  color: #4D4D4D;
+  text-decoration: none;
+}
+
+.accordion .link {
+  cursor: pointer;
+  display: block;
+  padding: 15px 15px 15px 42px;
+  color: #4D4D4D;
+  font-size: 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #CCC;
+  position: relative;
+  -webkit-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+
+.accordion li i {
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  font-size: 18px;
+  color: #595959;
+  -webkit-transition: all 0.4s ease;
+  -o-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+
+.accordion li i.fa-chevron-down {
+  right: 12px;
+  left: auto;
+  font-size: 16px;
+}
+
+.accordion li.open .link { color: #3b49ee; }
+
+.accordion li.open i { color: #3b49ee; }
+
+.accordion li.open i.fa-chevron-down {
+  -webkit-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+/**
+ * Submenu
+ -----------------------------*/
+
+
+.submenu {
+  display: none;
+  background: #FFF;
+  font-size: 14px;
+}
+
+.submenu li { border-bottom: 1px solid #CCC; }
+
+.submenu a {
+  display: block;
+  text-decoration: none;
+  color: #d9d9d9;
+  padding: 12px;
+  padding-left: 42px;
+  -webkit-transition: all 0.25s ease;
+  -o-transition: all 0.25s ease;
+  transition: all 0.25s ease;
+}
+
+.submenu a:hover {
+  background: #3b49ee;
+  color: #FFF;
+}

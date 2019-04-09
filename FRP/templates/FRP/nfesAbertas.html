@@ -1,0 +1,142 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% load octicons %}
+{% load humanize %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'FRP/nfesAbertas.css' %}">
+{% endblock %}
+
+{% block base-content %}
+<div class="wrapper">
+<div class = "table-container">
+    <h2 class="table-title"> NF-e Abertas </h2>
+    <div class="table-responsive">
+        <table class="table table-striped">      
+            <thead class="thead-dark"> 
+                <tr>
+                    <th class="th-nfe">NF-e</th>
+                    <th class="th-empresa">Empresa</th>
+                    <th claspyts="th-data-esperada">Data Esperada</th>
+                    <th class="th-valor-esperado">Valor Esperado</th>
+                    <th class="th-data-paga">Data Paga</th>
+                    <th class="th-valor-pago">Valor Pago</th>
+                    <th class="th-acoes">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="">
+                {%for parcela in parcelas_abertas%}            
+                <tr class="{{parcela.nfe.empresa.id}}">
+                    <form id ="form{{parcela.id}}" autocomplete="off" action="/FRP/nfes_abertas/update_nfe/" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="parcela-id" value="{{parcela.id}}">
+                        <input type="hidden" name="n_nfe" value="{{parcela.nfe.n_nfe}}">
+                        <td> {{parcela.nfe.n_nfe}}</td>
+                        <td> {{parcela.nfe.cnpj.empresa.nome}} </td>
+                        <td> {{parcela.data_esperada|date:"M/Y"}} </td>
+                        <td class="valorEsperado"> <span>R$</span> <span class="ValorEsperado">{{parcela.valor_esperado}}</span> </td>
+                        <td> {% if parcela.data_paga == None %} <input required class="inp-data-paga datepicker" type="text" name="data_paga" placeholder="Data Paga">{%else%} {{parcela.data_paga}} {% endif %}</td>
+                        <td> <span>R$</span> {% if parcela.valor_pago == None %} <input required type="text" class="inp-valor-pago" placeholder="Valor Pago" name="valor_pago">{%else%} {{parcela.valor_pago}} {% endif %} </td>
+                        <td> 
+                            <button type="submit" form="form{{parcela.id}}" class="btn">{% octicon 'cloud-upload' class='octicon'%} </button> 
+                            <a href="/FRP/nfes_abertas/remove_nfes/?pk={{parcela.id}}" class="btn">{% octicon 'remove' class='octicon'%}</span></a>
+                        </td>
+                    </form>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class = "table-container">
+        <h2 id="title-nfe-fechada" class="table-title" onclick="showHideDiv('nfe-fechadas')"> NF-e Fechadas </h2>
+        <div class="table-responsive" id="nfe-fechadas" style="display:none">
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th class="th-nfe">NF-e</th>
+                        <th class="th-empresa">Empresa</th>
+                        <th claspyts="th-data-esperada">Data Esperada</th>
+                        <th class="th-valor-esperado">Valor Esperado</th>
+                        <th class="th-data-paga">Data Paga</th>
+                        <th class="th-valor-pago">Valor Pago</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    {% for parcela in parcelas_fechadas %}            
+                    <tr class="{{parcela.nfe.empresa.id}}">
+                        <form id ="form{{parcela.id}}" autocomplete="off" action="/FRP/nfes_abertas/update_nfe/" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="parcela-id" value="{{parcela.id}}">
+                            <input type="hidden" name="n_nfe" value="{{parcela.nfe.n_nfe}}">
+                            <td> {{parcela.nfe.n_nfe}}</td>
+                            <td> {{parcela.nfe.cnpj.empresa.nome}} </td>
+                            <td> {{parcela.data_esperada|date:"M/Y"}} </td>
+                            <td class="valorEsperado"> <span>R$</span> <span class="ValorEsperado">{{parcela.valor_esperado}}</span> </td>
+                            <td> <input required class="inp-data-paga datepicker" type="text" name="data_paga" value='{{parcela.data_paga|date:"d-m-Y"}}'></td>
+                            <td class="valorEsperado"> <span>R$</span> <input  type="text" class="inp-valor-pago"  name="valor_pago" value="{{parcela.valor_pago}}"> </td>
+                            <td> 
+                                <button type="submit" form="form{{parcela.id}}" class="btn">{% octicon 'cloud-upload' class='octicon'%} </button> 
+                                <a href="/FRP/nfes_abertas/remove_nfes/?pk={{parcela.id}}" class="btn">{% octicon 'remove' class='octicon' %}</span></a>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block childscript %}
+
+$(".octicon").mouseenter(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+$(".octicon").mouseleave(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+
+function showHideDiv(id){
+    element_style = document.getElementById(id).style
+    if(element_style.display == "none") {
+        element_style.display="block";
+    } else {
+        element_style.display="none";
+    }
+}
+
+$('.inp-valor-pago').on('change keyup', function () {
+  // Remove invalid characters
+  var sanitized = $(this).val().replace(/[^-0-9,]/g, '');
+  // Remove non-leading minus signs
+  sanitized = sanitized.replace(/(.)-+/g, '$1');
+  // Remove the first point if there is more than one
+  sanitized = sanitized.replace(/,(?=.*,)/g, '');
+  // Update value
+  $(this).val(sanitized);  
+});
+
+$( function() {
+    $.each($(".datepicker"), function(i,l){
+        var aux = $(l).val();
+        $(l).datepicker();
+        $(l).datepicker( "option", "dateFormat", "dd-mm-yy");
+        $(l).datepicker( "option", "showAnim", "slideDown");
+        $(l).val(aux);
+    });
+
+    $.each($(".inp-valor-pago"), function(i,l){
+        var aux = $(l).val();
+        aux = aux.replace(".", ",");
+        $(l).val(aux);
+    });
+    
+    $.each($(".ValorEsperado"), function(i,l){
+        var aux = $(l).text();
+        aux = aux.replace(".", ",");
+        $(l).text(aux);
+    });
+} );
+{% endblock %}

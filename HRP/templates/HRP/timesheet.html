@@ -1,0 +1,411 @@
+{% extends 'main/main.html' %}
+
+{% load static %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/timesheet.css' %}">
+
+
+{% endblock %}
+
+{% block base-content %}
+    <div id="esperando-resposta" class='d-none alert-box alert radius'>
+        Esperando Resposta do Servidor
+    </div>
+    <div class="timesheet row">
+        <div class ="col-md-5">
+            <div id="datepicker"></div>
+        </div>
+        <div id = "dados-timesheet" class="col-md-7">
+
+            <form method="POST" id = "form_horario" onsubmit="">
+                {% csrf_token %}
+                <input type="text" id = "datas" class="d-none">
+                <select name="empresa" id="empresa" class="placeholder" onchange="empresa_change(this);"> 
+                    <option value="" hidden selected> Cliente </option>
+                    {% for empresa in empresas %}
+                    <option  value="{{empresa.1}}"> {{empresa.0}} </option>
+                    {% endfor %}
+                </select>
+                <select name = "area" id="area" class="placeholder" onchange="remove_placeholder('area')">
+                    <option value="" hidden selected>Área</option>
+                </select>
+                <select name = "projeto" id="projeto" class="placeholder" style="width: 100%;" onchange="select_change()">
+                    <option value="" hidden selected>Projeto</option>
+                    <option value="outro" style="font-weight: bold !important;">Novo projeto</option>
+                </select>
+                <input type="text" name="outro" style="padding-left: 10px;" placeholder="Adicionar Projeto" id="outronovo" class="d-none">
+                <div style="width: 0px;height: 0px;position: relative;">
+                {% octicon 'triangle-right' id="iconenovo" class="d-none" style="position:absolute;left:3px;bottom:12px;fill:grey;" onclick="hidetextbox('outronovo')" %}
+                </div>
+                <textarea id = "comentario" placeholder="Comentários"></textarea> 
+                <input type="number" min="0" id = "horas" placeholder="Horas"> 
+                <div id="separador-hora-min"> : </div> 
+                <input type="number" min="0" id = "minutos" placeholder="Min">
+                <button form="form_horario" type="Submit" class="btn" id="enviar" value="Enviar">Enviar</button>
+            </form>
+            <a class="btn" id="btn-registro" href="/HRP/timesheet/meus_registros"> Meus Registros </a>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block childscript %}
+
+$(".octicon").mouseenter(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+$(".octicon").mouseleave(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+
+function hidetextbox(){
+    $('#projeto').removeClass('d-none');
+    $('#projeto').addClass('placeholder');
+    $('#outronovo').addClass('d-none');
+    $('#iconenovo').addClass('d-none');
+    $('#projeto').val('');
+}   
+
+
+select_valid_flag = true;
+
+function select_change(){
+    if (select_valid_flag){
+        $("#projeto").addClass("valid");
+        select_valid_flag = false;
+        $('#projeto').removeClass('placeholder');
+    }
+    if($('#projeto').val() == "outro"){
+        $('#projeto').addClass('d-none');
+        $('#outronovo').val("");
+        $('#outronovo').removeClass('d-none');
+        $('#outronovo').focus();
+        $('#iconenovo').removeClass('d-none');
+        
+        $("#projeto").removeClass("valid");
+        
+        select_valid_flag = true;
+    }
+}
+
+function validate_form(id){
+    var error_log = 'Erros: \n';
+    var valid = true;
+
+    var hours = parseInt($('#horas').val()) || 0;
+    var mins = parseInt($('#minutos').val()) || 0;
+
+    if (dates.length == 0){
+        error_log += "- Selecione pelo menos uma data \n";
+        valid = false
+    }
+    if ($('#empresa').val() == ''){
+        error_log += "- Selecione uma empresa \n";
+        valid = false
+    }
+    if ($('#area').val() == ''){
+        error_log += "- Selecione uma área \n";
+        valid = false
+    }
+    if ($('#projeto').val() == ''){
+        error_log += "- Selecione um projeto \n";
+        valid = false
+    }else if(($('#projeto').val() == 'outro') && ($('#outronovo').val() == '')){
+        error_log += "- Insira o nome do novo projeto \n";
+        valid = false
+    }
+    if (($('#horas').val() == '') && ($('#minutos').val() == '')){
+        error_log += "- Atribua um valor no campo de horas ou minutos \n";
+        valid = false
+    }
+    if (hours + mins == 0){
+        error_log += "- Atribua um valor não nulo no campo de horas e minutos \n";
+        valid = false
+    }
+
+    if (! valid){
+        alert(error_log)
+    }
+    return valid;
+}
+
+var areas_dict = {};
+{% for empresa,val in areas.items %}
+    areas_dict["{{empresa}}"] = [{% for area in val %} ["{{area.nome}}","{{area.id}}"] {{loop.last}}{% if not forloop.last %} , {%else%} {%endif%} {% endfor %}];
+{% endfor %}
+
+var projetos_dict = {};
+{% for empresa,val in projetos.items %}
+    projetos_dict["{{empresa}}"] = [{% for projeto in val %} ["{{projeto.descricao}}","{{projeto.id}}"] {{loop.last}}{% if not forloop.last %} , {%else%} {%endif%} {% endfor %}];
+{% endfor %}
+
+empresas_placeholder_flag = true;
+
+function empresa_change(selectObject){
+
+    if (empresas_placeholder_flag){
+        $("#empresa").removeClass("placeholder");
+        empresas_placeholder_flag = false;
+    }
+
+// Renovando as opções de áreas
+    var areas_possiveis = areas_dict[selectObject.value];
+    var select = document.getElementById('area');
+
+    $("#area").addClass("placeholder");
+    
+    select.options.length = 1
+    for(var i=1; i < areas_possiveis.length + 1;i++){
+        select.options[i] = new Option(areas_possiveis[i-1][0], areas_possiveis[i-1][1]);
+    }
+
+// Renovando as opções de Projetos
+    var projetos_possiveis = projetos_dict[selectObject.value];
+    var select = document.getElementById('projeto');
+
+    var projeto = $("#projeto");
+    projeto.addClass("placeholder");
+    
+    select.options.length = 1
+    for(var i=1; i < projetos_possiveis.length + 1;i++){
+        select.options[i] = new Option(projetos_possiveis[i-1][0], projetos_possiveis[i-1][1]);
+    }
+
+    if(projeto.hasClass("d-none")){
+        hidetextbox();
+    }
+
+    select.options[i] = new Option("Novo Projeto", "outro");
+    select.options[i].setAttribute("style", "font-weight: bold !important;");
+}
+
+function remove_placeholder(id){
+    $('#'+id).removeClass('placeholder');
+}
+
+// ------------------------------------- Date Picker ------------------------------------------------------
+// source: https://stackoverflow.com/questions/1452066/jquery-ui-datepicker-multiple-date-selections
+
+window.onload = function(){
+    $(".ui-datepicker-calendar .ui-datepicker-today a").trigger('click');
+    // $(".ui-datepicker-calendar td(.ui-datepicker-today) a").trigger('click');
+};
+
+var dates = new Array();
+
+function addDate(date) {
+    if (jQuery.inArray(date, dates) < 0) 
+        dates.push(date);
+        $("#datas").val(dates);
+}
+
+function removeDate(index) {
+    dates.splice(index, 1);
+    $("#datas").val(dates);
+}
+
+// Adds a date if we don't have it yet, else remove it
+function addOrRemoveDate(date) {
+    var index = jQuery.inArray(date, dates);
+    if (index >= 0) 
+        removeDate(index);
+    else 
+        addDate(date);
+}
+
+// Takes a 1-digit number and inserts a zero before it
+function padNumber(number) {
+    var ret = new String(number);
+    if (ret.length == 1) 
+        ret = "0" + ret;
+    return ret;
+}
+
+jQuery(function () {
+    jQuery("#datepicker").datepicker({
+        onSelect: function (dateText, inst) {
+            addOrRemoveDate(dateText);
+            $(".ui-datepicker-current-day .ui-state-active").removeClass("ui-state-active");
+        },
+        beforeShowDay: function (date) {
+            var year = date.getFullYear();
+            // months and days are inserted into the array in the form, e.g "01/01/2009", but here the format is "1/1/2009"
+            var month = padNumber(date.getMonth() + 1);
+            var day = padNumber(date.getDate());
+            // This depends on the datepicker's date format
+            var dateString = month + "/" + day + "/" + year;
+
+            var gotDate = jQuery.inArray(dateString, dates);
+            if (gotDate >= 0) {
+                // Enable date so it can be deselected. Set style to be highlighted
+                return [true, "ui-dia-selecionado"];
+            }
+            // Dates not in the array are left enabled, but with no extra style
+            return [true, ""];
+        },
+        monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+        dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+        dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+        dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+        monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+        nextText: 'Próximo',
+        prevText: 'Anterior',
+        //dateFormat: 'dd/mm/yy',
+    });
+});
+
+
+// ------------------------------------ AJAX ------------------------------------
+
+function create_post() {
+
+    $.ajax({
+        url : "submit_horario/", // the endpoint
+        type : "POST", // http method
+        data : {
+                area : $('#area').val(),
+                datas : $('#datas').val(),
+                horas : $('#horas').val(),
+                minutos : $('#minutos').val(),
+                comentario : $('#comentario').val(),
+                projeto : $('#projeto').val(), 
+                novo_projeto: $('#outronovo').val(),
+    
+                }, // data sent with the post request
+        
+
+        // handle a successful response
+        success : function(result) {
+
+            if (result["status"] == true){
+                var success_log = "Hora registrada com sucesso! \n\nValores: \n";
+                for (var key in result["valores_inseridos"]){
+                    success_log += "- " + key + ": " + result["valores_inseridos"][key] + "\n";
+                }
+                alert(success_log);
+                
+                // updates project dictionary
+                if ($('#projeto').val() == 'outro') {
+                    var aux_projeto = result["projeto"];
+                    if (aux_projeto){
+                        projetos_dict[aux_projeto[0]].push([aux_projeto[1],aux_projeto[2]]);
+                    }
+                    $('#iconenovo').addClass('d-none');
+                }
+
+                // remove the value from the input
+                $('#empresa').val('');
+                $('#area').val('');
+                $('#datas').val('');
+                dates = [];
+                $(".ui-dia-selecionado").removeClass("ui-dia-selecionado")
+                $('#horas').val('');
+                $('#minutos').val(''); 
+                $('#comentario').val(''); 
+                $('#projeto').val('');
+                $('#outronovo').val('');
+
+                var select = document.getElementById('area');
+                select.options.length = 1;
+                var select = document.getElementById('projeto');
+                select.options.length = 1;
+
+                $('#projeto').removeClass('d-none');
+                $('#outronovo').addClass('d-none');
+                $("#projeto").addClass("valid");
+                $('#projeto').addClass('placeholder');
+                $('#area').addClass('placeholder');
+                $('#empresa').addClass('placeholder');
+                empresas_placeholder_flag = true
+                select_valid_flag = true
+
+
+            }else{
+                alert(result.log_erro);
+            }           
+
+        },
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+
+            alert("Algum erro aconteceu no servidor!\n\nDescrição:\n - Status: " + xhr.status + "\n - Mensagem: " + errmsg)
+
+        }
+    });
+};
+
+$('#form_horario').on('submit', function(event){
+    event.preventDefault();
+    var valid_form = validate_form('#form_horario');
+    
+    if(valid_form){
+        create_post();
+    }
+    
+});
+
+
+// ------------------------------------ CSFR ------------------------------------
+$(function() {
+
+
+    // This function gets cookie with a given name
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    /*
+    The functions below will create a header with csrftoken
+    */
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    function sameOrigin(url) {
+        // test that a given url is a same-origin URL
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                // Send the token to same-origin, relative URLs only.
+                // Send the token only if the method warrants CSRF protection
+                // Using the CSRFToken value acquired earlier
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+});
+// --------------------------------------------------------------------------------------------------
+
+
+
+{% endblock %}

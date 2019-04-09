@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html>	
+	<head>
+		{% load static %}
+		{% load octicons %}
+		
+	    <meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<title>BIX Digital</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+		
+		<!-- <script src="{% static 'js/intranet-sidebar.js' %}"></script> -->
+		
+		<!-- JQUERY DATEPICKER -->
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<link rel="stylesheet" href="{% static 'plugins/chosen.css' %}">
+		<script type="text/javascript" src="{% static 'plugins/chosen.jquery.js' %}"></script>
+		<link rel="stylesheet" href="{% static 'css/main/header.css' %}">
+		<link rel="stylesheet" href="{% static 'css/main/main.css' %}">
+		{% load bootstrap4 %}
+		{% bootstrap_css %} 
+		{% bootstrap_javascript %} 
+		{% block links %}
+		
+		{% endblock %}
+	</head>
+	
+	<body> <!-- background="{% static 'imgs/Background.PNG' %}" -->
+
+		<!-- ----------------------- HEADER ----------------------- -->
+		<div class = "header">
+			<div class= "header-left">
+				<a class="logo" href="/">
+					<img src="{% static 'imgs/BIX_logo.png' %}" width="200" alt="BIX Tecnologia Logo">
+				</a>
+			</div>
+			
+			<div class="header-breadcumb">
+				<ul class="breadcrumb">
+					{% for aux in breadcrumb %}
+					<li><a href="{{aux.0}}">{{aux.1}}</a>
+					{% if not forloop.last %}  {% octicon 'chevron-right' style="position: relative;top: 2px;" class='breadcrumb-chevron' %}   {%else%} {%endif%}</li>
+					{% endfor %}
+				</ul>
+			</div>
+			{% if user.is_authenticated %}
+			<div class="header-right">
+				<i onclick="hamb_click()" id="hamburguer" class="fa fa-bars" aria-hidden="true"></i>
+			</div>
+			{% endif %}
+		</div>
+		{% if user.is_authenticated %}
+		<ul id="accordion" class="accordion">
+		<!--ref: https://codepen.io/fainder/pen/AydHJ -->
+
+		  <li>
+		    <div class="link"><i class="fa fa-users"></i>Recursos Humanos<i class="fa fa-chevron-down"></i></div>
+		    <ul class="submenu">
+		      <li><a href="/HRP/perfil/{{request.user.colaborador.id}}/">Perfil</a></li>
+		      {% if request.user.is_RH or request.user.is_manager %}
+		      <li><a href="/HRP/controle">Colaboradores</a></li>
+		      {% endif %}
+		      <li><a href="/HRP/timesheet/">Timesheet</a></li>
+		      <li><a href="/HRP/allocation/">Alocação</a></li>
+		    </ul>
+		  </li>
+		  <li>
+		    <div class="link"><i class="fa fa-industry"></i>Clientes<i class="fa fa-chevron-down"></i></div>
+		    <ul class="submenu">
+		      <li><a href="/CRP/controle">Controle</a></li>
+		    </ul>
+		  </li>
+		  <li>
+		    <div class="link"><i class="fa fa-money"></i>Financeiro<i class="fa fa-chevron-down"></i></div>
+		    <ul class="submenu">
+		      <li><a href="/FRP/metas/">Metas</a></li>
+		      {% if request.user.is_financeiro or request.user.is_manager %}
+		      <li><a href="/FRP/nfes_abertas/">NF-e Abertas</a></li>
+		      <li><a href="/FRP/pagamento_padrao/">Pagamento Padrão</a></li>
+		      {% endif %}
+		    </ul>
+		  </li>
+		  <li>
+		    <div class="link"><i class="fa fa-unlock-alt"></i>Conta<i class="fa fa-chevron-down"></i></div>
+		    <ul class="submenu">
+		      <li><a href="/auth/account/">Gerenciar Conta</a></li>
+		      <li><a href="/auth/logout/">Log Out</a></li>
+		    </ul>
+		  </li>
+		</ul>
+		{% endif %}
+		<!-- ----------------------- HEADER ----------------------- -->	
+
+		<div id="block-base-content" style="margin-bottom: 15px;">
+		{% block base-content %}
+
+		{% endblock %}
+		</div>
+		
+		<script>
+
+			{% if errorlog %}
+				window.onload = function(){
+					alert('{{errorlog}}');
+				};
+			{% endif %}
+
+			// -- ----------------------- HEADER ----------------------- 	
+			$(".entrada").mouseenter(function(e){
+				var id = "." + $(this).attr('name');
+				$(".header-options:first-child, .index-options img:first-child").removeClass("d-none");
+				$(".index-options img:first-child").css('border-color', "#33323d");
+				$(".header-options:last-child, .index-options img:last-child").addClass("d-none");
+				$(id).toggleClass("d-none");
+				$(id).css('border-color', "#3b49ee");
+			});
+			$(".saida").mouseleave(function(e){
+				var id = "." + $(this).attr('name');
+				$(id).toggleClass("d-none");
+				$(id).css('border-color', "#33323d");
+			});
+			// -- ----------------------- HEADER ----------------------- 	
+
+			if($(".row").length > 0){
+				$("#block-base-content").addClass("container");
+			}
+
+			// Acordion Menu
+			$(function() {
+				var Accordion = function(el, multiple) {
+					this.el = el || {};
+					this.multiple = multiple || false;
+
+					// Variables privadas
+					var links = this.el.find('.link');
+					// Evento
+					links.on('click', {el: this.el, multiple: this.multiple}, this.dropdown)
+				}
+
+				Accordion.prototype.dropdown = function(e) {
+					var $el = e.data.el;
+						$this = $(this),
+						$next = $this.next();
+
+					$next.slideToggle();
+					$this.parent().toggleClass('open');
+
+					if (!e.data.multiple) {
+						$el.find('.submenu').not($next).slideUp().parent().removeClass('open');
+					};
+				}	
+
+				var accordion = new Accordion($('#accordion'), false);
+			});
+
+			var open = false;
+			function hamb_click(){
+				$("#hamburguer").toggleClass("hamb-clicked");
+
+				if(open){
+					$("#accordion").removeClass("open_accordion");
+				}else{
+					$("#accordion").addClass("show_accordion");
+					timeout = setTimeout(function() {
+						$("#accordion").removeClass("show_accordion");
+						$("#accordion").addClass("open_accordion");
+					}, 200);
+				}
+
+				open = !open
+			}
+			{% block childscript %}
+
+			{% endblock%}
+	
+		</script>
+
+	<script src="{% static 'plugins/bootstrap.min.js' %}"></script>
+
+	</body>
+
+
+</html>
+
+

@@ -1,0 +1,71 @@
+﻿{% extends 'main/main.html' %}
+
+{% load static %}
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/login/login.css' %}">
+{% endblock %}
+
+{% block base-content %}
+
+<div class="container">
+    <div class="login-panel">
+        <div class="login-panel-heading">
+            <h3 class="form-signin-heading"> Gerenciar credenciais </h4>
+        </div>
+        <div class="form-wrapper">
+            <form method="post" class="form-signin">
+            {% csrf_token %}
+                <div class="group">      
+                    <input type="text" name="username" value = "{{request.user.username}}" required>
+                    <span class="highlight right"></span>
+                    <span class="bar"></span>
+                    <label>Nome de usuário</label>
+                </div>
+                    
+                <div class="group">      
+                    <input type="text" name="password"  onchange="toggle_empty()">
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label id = "label-pass" class="label-empty-input">Nova senha</label>
+                </div>
+
+                <div class="group">      
+                    <input type="text" name="email" value="{{request.user.colaborador.email}}" required>
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Email</label>
+                </div>
+            
+                <button class="btn" type="submit">Aceitar mudanças</button>        
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block childscript %}
+    function toggle_empty(){
+        var obj = $("#label-pass");
+
+        if ((obj.val() == "") && !(obj.hasClass('label-empty-input')) ){
+            obj.addClass('label-empty-input');
+        }else{
+            obj.removeClass('label-empty-input');
+        }
+    }
+    {% if log %}
+        var log = "";
+        {% for l in log %}
+            log += "{{l}}" + "\n";
+        {% endfor %}
+
+        $("document").ready( function () {
+            alert(log);
+        }); 
+    {% endif %}
+
+{% endblock %}
+
+
+

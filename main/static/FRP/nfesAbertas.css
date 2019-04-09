@@ -1,0 +1,208 @@
+
+.wrapper{
+    padding-left: 10%;
+    padding-right: 10%;
+    min-width: 320px;
+}
+
+.table-container{
+    display: inline-block;
+    padding-top: 30px;
+    width: 100%;
+}
+
+select{
+    height: 30px;
+}
+
+/* Title */
+.table-title{
+    display:inline-block;
+    color: #33323d;
+    border-bottom: 2px solid #3b49ee;
+    padding: 0px 10px 0px 10px;
+    font-weight: 400;
+    margin-top: 30px;
+}
+
+/* TABELAS */
+.table-responsive{
+    padding-top: 20px;
+}
+/* Table rounded borders */
+.table {
+    border-spacing: 0;
+    border-collapse: separate;
+    text-align: center;
+}
+.table tr:first-child th:first-child { 
+    border-radius: 4px 0 0 0; 
+}
+
+.table tr:first-child th:last-child { 
+    border-radius: 0 4px 0 0; 
+}
+
+.table tr:last-child td:first-of-type {
+    border-radius: 0 0 0 4px;
+}
+
+.table tr:last-child td:last-child { 
+    border-radius: 0 0 4px 0; 
+}  
+
+.table tr th{
+    background-color: #33323d !important;
+    color: white !important;
+}
+
+td:first-of-type{
+    border-left: 1px solid #33323d;
+}
+th{
+    border-right: 1px solid white !important; 
+    border-left: none;
+}
+th:last-child{
+    border-right: 1px solid #33323d !important; 
+    border-left: none;
+}
+td{
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    border-right: 1px solid #33323d;
+    border-bottom: 1px solid #33323d;
+    text-align: center;
+}
+.th-acoes{
+    width: 120px;
+    text-align: center;
+}
+
+table input:hover, table input:focus, table select:hover, table select:focus{ border-bottom: 1px solid #3146F2; }
+/* Inputs */
+
+.table-striped tbody tr:nth-of-type(odd){
+    background-color:rgba(0, 0, 0,0.15);
+}
+
+table input,table select{
+    border:none;
+    background-color:rgba(0,0,0,0);
+    width: 100%;
+    padding: 0 0 0 0;
+}
+table input{
+    position: relative;
+    padding: 0 0 0 0;
+    text-align: center;
+}
+table select{
+    position: relative;
+    bottom: 0.5px;
+    left: -4px;
+    padding: 0 0 0 0;
+}
+table .btn{
+    background-color: rgba(0,0,0,0);
+    height: 20px;
+    padding: 0 .75rem;
+}
+
+.th-valor-pago{
+    min-width: 90px;
+    max-width: 136px;
+}
+
+.th-data-paga{
+    min-width: 90px;
+    width: 130px;
+}
+
+.inp-valor-pago{
+    min-width: 70px;
+    max-width: 150px;
+}
+
+span{
+    float: left;
+}
+
+.ValorEsperado{
+    float: none;
+}
+
+#title-nfe-fechada:hover{
+    cursor: pointer;
+    border-bottom: 2px solid #89f2f2;
+}
+
+.nfe-fechadas{
+    display: none;
+}
+@media screen and (max-width: 1000px) {
+    
+    .wrapper{
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    span{
+        display: none;
+    }
+
+    .ValorEsperado{
+        display: inline-block
+    }
+
+    .inp-valor-pago{
+        max-width: 80px;
+    }
+
+    html{
+        overflow: scroll;
+    }
+    
+    td{
+        padding-right: 0px !important;
+        padding-left: 0px !important;
+        font-size: 1rem;
+        text-align: center;
+    }
+    table input,table select{
+        text-align: center;
+        height: 20px;
+        left: 0px !important;
+        top: 0px !important;
+        bottom: 0px !important;
+        max-width: 70px;
+    }
+    table select::-ms-expand {
+        display: none;
+    }
+    table select{
+        text-align-last: center;
+        top: 6px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+    h2{
+        font-size: 23px;
+    }
+    
+}
+
+textarea:focus, input:focus, select:focus{
+    outline-color: transparent !important;
+}
+
+.inp-data-paga:focus::-webkit-input-placeholder{
+    color: transparent;
+}
+
+.inp-valor-pago:focus::-webkit-input-placeholder{
+    color: transparent;
+}
+
+tr{
+    height: 33px;
+}

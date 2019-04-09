@@ -1,0 +1,193 @@
+{% extends 'main/main.html' %}
+
+{% load static %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'FRP/metas.css' %}">
+{% endblock %}
+
+{% block base-content %}
+
+{% for message in messages %}
+  <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message }}
+  </div>
+{% endfor %}
+
+<div class="wrapper">
+    <div class="table-container">
+        
+        <div class="new-meta">
+            <h2 class="table-title"> Metas </h2>
+            <button class="btn-add">+</p>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th class="th-mes">Mês</th>
+                        <th class="th-meta">Meta</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="metas-infos">
+                    {% for meta in metas %}
+                    <tr class="{{meta.id}}">
+                        <form id="form{{meta.id}}" autocomplete="off" action="/FRP/metas/edit_meta/" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="meta-id" value="{{meta.id}}">
+                            <td> <input type="text" name="mes" class="datepicker" value='{{meta.mes|date:"m/Y"}}'> </td>
+                            <td> <span>R$</span> <input type="text" name="valor" class="meta-value" value="{{meta.valor|floatformat:2}}"> </td>
+                            <td> 
+                                <button type="submit" form="form{{meta.id}}" class="btn">{% octicon 'cloud-upload' class='octicon'%} </button> 
+                                <a href="/FRP/metas/remove_meta/?pk={{meta.id}}" class="btn">{% octicon 'remove' class='octicon' %}</span></a>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block childscript %}
+
+
+$(".octicon").mouseenter(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+$(".octicon").mouseleave(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+
+$( function() {
+    $.each($(".datepicker"), function(i,l){
+        var aux = $(l).val();
+        $(l).datepicker( {
+            monthNames: [ "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" ],
+            monthNamesShort: [ "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" ],
+            dateFormat: "mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            currentText: "Hoje",
+            closeText: "Pronto",
+            showButtonPanel: true,
+            onClose: function(dateText, inst) {
+                
+                
+                function isDonePressed(){
+                    return ($('#ui-datepicker-div').html().indexOf('ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all ui-state-hover') > -1);
+                }
+                
+                if (isDonePressed()){
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1)).trigger('change');
+                    
+                    $('.date-picker').focusout()//Added to remove focus from datepicker input box on selecting date
+                }
+            },
+            beforeShow : function(input, inst) {
+                
+                inst.dpDiv.addClass('month_year_datepicker')
+                
+                if ((datestr = $(this).val()).length > 0) {
+                    year = datestr.substring(datestr.length-4, datestr.length);
+                    month = datestr.substring(0, 2);
+                    $(this).datepicker('option', 'defaultDate', new Date(year, month-1, 1));
+                    $(this).datepicker('setDate', new Date(year, month-1, 1));
+                    $(".ui-datepicker-calendar").hide();
+                }
+            }
+        });
+        $(l).val(aux);
+    });
+    
+    $.each($(".meta-value"), function(i,l){
+        var aux = $(l).val();
+        aux = aux.replace(".", ",");
+        $(l).val(aux);
+    });
+});
+
+function removeMetaLine(link){
+    link.parentElement.parentElement.remove();
+}
+
+function new_meta(link){
+    var mes_value = link.parentElement.parentElement.childNodes[1].childNodes[1].value;
+    console.log(mes_value);
+    var meta_value = link.parentElement.parentElement.childNodes[2].childNodes[2].value;
+    console.log(meta_value);
+    window.location.href = 'new_meta/?mes='+mes_value+'&valor='+meta_value;
+}
+
+var counter = 0;
+$(".btn-add").click(function(){
+    counter++;
+    console.log("Button pressed");
+    var metaString = [
+                        '<tr>',
+                            '<form id="new'+ counter +'" autocomplete="off" action="/FRP/metas/new_meta/" method="get">',
+                                '<td> <input required type="text" name="mes" class="datepicker" placeholder="Mês"> </td>',
+                                '<td><span>R$</span> <input required type="text" name="valor" class="meta-value" placeholder="Meta"></td>',
+                                '<td>',
+                                    '<button type="button" form="new'+ counter +'" onclick="new_meta(this)" class="btn btn-send">{% octicon "cloud-upload"%} </button>', 
+                                    '<a onclick="removeMetaLine(this)" class="btn new-meta-line">{% octicon "remove"%}</span></a>',
+                                '</td>',
+                            '</form>',
+                        '</tr>'
+                    ];
+
+        console.log(metaString.join(''));
+        $(".metas-infos").prepend(metaString.join(''));
+        $.each($(".datepicker"), function(i,l){
+        var aux = $(l).val();
+        $(l).datepicker( {
+            monthNames: [ "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" ],
+            monthNamesShort: [ "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" ],
+            dateFormat: "mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            currentText: "Hoje",
+            closeText: "Pronto",
+            showButtonPanel: true,
+            onClose: function(dateText, inst) {
+
+
+                function isDonePressed(){
+                    return ($('#ui-datepicker-div').html().indexOf('ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all ui-state-hover') > -1);
+                }
+
+                if (isDonePressed()){
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1)).trigger('change');
+                    
+                        $('.date-picker').focusout()//Added to remove focus from datepicker input box on selecting date
+                }
+            },
+            beforeShow : function(input, inst) {
+
+                inst.dpDiv.addClass('month_year_datepicker')
+
+                if ((datestr = $(this).val()).length > 0) {
+                    year = datestr.substring(datestr.length-4, datestr.length);
+                    month = datestr.substring(0, 2);
+                    $(this).datepicker('option', 'defaultDate', new Date(year, month-1, 1));
+                    $(this).datepicker('setDate', new Date(year, month-1, 1));
+                    $(".ui-datepicker-calendar").hide();
+                }
+            }
+        });
+        $(l).val(aux);
+    });
+});
+{% endblock %}

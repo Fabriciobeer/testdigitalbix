@@ -1,0 +1,572 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'HRP/profile.css' %}">
+{% endblock %}
+
+{% block base-content %}
+<div class="grid wrapper">
+    <div class = "grid" id="profile-menu">
+        <div class="grid" id="profile-pic">
+            <div id="nome-colab" class="field">
+                <h3 class="table-title">
+                    {{adm_form.nome.value}}
+                </h3>
+            </div>
+            <div class="field">
+                <div class = "pic-wrapper">
+                    <a href="#" onclick="profile_pic_click();">
+                        <img id="profile-pic-img" src="{{media_url}}{{adm_form.profile_pic.value}}" ></img>
+                    </a>
+                    <form action="/HRP/change_profile_pic/{{pk}}/" id="profile-pic-form" method="POST" enctype='multipart/form-data'>
+                    {% csrf_token %}
+                        <input accept="image/*" onchange="submit_profile_pic_form();" type="file" name="profile-pic" id="profile-pic-input">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="grid data-ferias" {% if not request.user.is_manager and not request.user.is_RH %} style="grid-template-rows: 40px 0px;" {% endif %}>
+            <div id="saldo" class="Field">
+                Saldo de Férias:<span style="color:{% if saldo_ferias >= 0 %} green {% else %} red {% endif %};"> {{saldo_ferias}} </span>Dias
+            </div>
+                    
+            <div class="grid" style="grid-auto-rows: 0px 0px; grid-row-gap:15px;">
+                {% if request.user.is_manager or request.user.is_RH %}
+                <div id="ferias-label">Cadastrar Férias:</div>
+                <form id="form-ferias" action="/HRP/add_ferias/{{pk}}/" autocomplete="off" method="POST" onsubmit="ferias_form_validation();">
+                {% csrf_token %}
+                    <div id="ferias-form" class="grid">
+                        <div class="field">
+                            <input class="datepicker" style="top:-30px;" type="text" autocomplete="off" id="ferias_data_i" name="data_i" required>
+                            <label>Data Inicial<span>:</span></label>
+                        </div>
+                        <div class="field">
+                            <input class="datepicker" type="text" autocomplete="off" name="data_f" id="ferias_data_f" required>
+                            <label>Data Final<span>:</span></label>
+                        </div>
+                        <button form="form-ferias" class="padrao-btn btn"> Enviar </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            <div id="registro-ferias">
+                <div class="table-wrapper">
+                    <table class="table-profile">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Dias
+                                </th>
+                                <th>
+                                    Periodo
+                                </th>
+                                {% if request.user.is_manager or request.user.is_RH %}
+                                <th>
+                                    Deletar
+                                </th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for registro in ferias %}
+                            <tr>
+                                <td>
+                                    {{registro.0}}
+                                </td>
+                                <td>
+                                    {{registro.1}}
+                                </td>
+                                {% if request.user.is_manager or request.user.is_RH %}
+                                <td>
+                                    <a href="/HRP/remover_ferias/{{registro.2}}" style="position: relative;top: 3px">{% octicon 'remove' class='octicon'%}</span></a>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="profile-info" >
+        <div class="table-title-wrapper">
+            <h2 class="table-title" {% if request.user.is_RH or request.user.is_manager %} onclick="toggle_d_none('#formulario-admissao')" {% endif %}> Dados Admissionais</h2>
+        </div>
+        <form autocomplete="off" id="formulario-admissao" method="POST" enctype='multipart/form-data'>
+        {% csrf_token %}
+            <div class="grid" id="data-form">
+                <div class="grid form-row-aux" style="grid-template-columns: calc(50% - 7px) calc(25% - 7px) calc(25% - 8px);">
+                    <div class="field {% if adm_form.nome.errors %}invalid{% endif %}">
+                        {{adm_form.nome}}
+                        <label>Nome<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.raca_cor.errors %}invalid{% endif %}">
+                        {{adm_form.raca_cor}}
+                        <label>Raça/Cor:</label>
+                    </div>
+                    <div class="field {% if adm_form.genero.errors %}invalid{% endif %}">
+                        {{adm_form.genero}}
+                        <label>Gênero:</label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-2">
+                    <div class="field {% if adm_form.nome_pai.errors %}invalid{% endif %}">
+                        {{adm_form.nome_pai}}
+                        <label>Nome do Pai<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.nome_mae.errors %}invalid{% endif %}">
+                        {{adm_form.nome_mae}}
+                        <label>Nome da Mãe<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux" style="grid-template-columns: calc(25% - 5px) calc(75% - 5px);">
+                    <div class="field {% if adm_form.telefone.errors %}invalid{% endif %}">
+                        {{adm_form.telefone}}
+                        <label>Telefone<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.email.errors %}invalid{% endif %}">
+                        {{adm_form.email}}
+                        <label>E-mail<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-3">
+                    <div class="field  {% if adm_form.data_admissao.errors %}invalid{% endif %}">
+                        {{adm_form.data_admissao}}
+                        <label>Data de Admissão<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.funcao.errors %}invalid{% endif %}">
+                        {{adm_form.funcao}}
+                        <label>Função<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.escolaridade.errors %}invalid{% endif %}">
+                        {{adm_form.escolaridade}}
+                        <label>Escolaridade<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-4">
+                    <div class="field {% if adm_form.carteira_trabalho.errors %}invalid{% endif %}">
+                        {{adm_form.carteira_trabalho}}
+                        <label>Carteira de Trabalho<span>:</span></label>
+                    </div>
+                    <div class="field  {% if adm_form.num_carteira_trabalho.errors %}invalid{% endif %}">
+                        {{adm_form.num_carteira_trabalho}}
+                        <label>Número<span>:</span></label>
+                    </div>
+                    <div class="field  {% if adm_form.serie_carteira_trabalho.errors %}invalid{% endif %}">
+                        {{adm_form.serie_carteira_trabalho}}
+                        <label>Série<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.data_exp_carteira_trabalho.errors %}invalid{% endif %}">
+                        {{adm_form.data_exp_carteira_trabalho}}
+                        <label>Data Exp.<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux" style="grid-template-columns: calc(50% - 7px) calc(25% - 7px) calc(25% - 8px);">
+                    <div class="field">
+                        {{adm_form.municipio_nascimento}}
+                        <label>Município Nascimento<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.uf_nascimento.errors %}invalid{% endif %}">
+                        {{adm_form.uf_nascimento}}
+                        <label>UF<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.data_nascimento.errors %}invalid{% endif %}">
+                        {{adm_form.data_nascimento}}
+                        <label>Data<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-2">
+                    <div class="field {% if adm_form.endereco.errors %}invalid{% endif %}">
+                        {{adm_form.endereco}}
+                        <label>Endereço Atual<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.bairro.errors %}invalid{% endif %}">
+                        {{adm_form.bairro}}
+                        <label>Bairro<span>:</span></label>
+                    </div>              
+                </div>
+                <div class="grid form-row-aux" style="grid-template-columns: calc(40% - 7px) calc(10% - 7.5px) calc(20% - 7.5px) calc(30% - 8px);">
+                    <div class="field {% if adm_form.cidade.errors %}invalid{% endif %}">
+                        {{adm_form.cidade}}
+                        <label>Cidade<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.uf.errors %}invalid{% endif %}">
+                        {{adm_form.uf}}
+                        <label>UF<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.cep.errors %}invalid{% endif %}">
+                        {{adm_form.cep}}
+                        <label>CEP<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.estado_civil.errors %}invalid{% endif %}">
+                        {{adm_form.estado_civil}}
+                        <label>Estado Civil<span>:</span></label>
+                    </div>  
+                </div>
+                <div class="grid form-row-aux aux-3">
+                    <div class="field {% if adm_form.cpf.errors %}invalid{% endif %}">
+                        {{adm_form.cpf}}
+                        <label>CPF<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.n_pis.errors %}invalid{% endif %}">
+                        {{adm_form.n_pis}}
+                        <label>Nº PIS<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.data_cadastramento.errors %}invalid{% endif %}">
+                        {{adm_form.data_cadastramento}}
+                        <label>Data Cadastro<span>:</span></label>
+                    </div>                      
+                </div>
+                <div class="grid form-row-aux aux-3">
+                     <div class="field {% if adm_form.rg.errors %}invalid{% endif %}">
+                        {{adm_form.rg}}
+                        <label>RG<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.org_emissor_rg.errors %}invalid{% endif %}">
+                        {{adm_form.org_emissor_rg}}
+                        <label>Org. Emissor<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.data_exp_rg.errors %}invalid{% endif %}">
+                        {{adm_form.data_exp_rg}}
+                        <label>Data Expedição<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-3">
+                     <div class="field {% if adm_form.titulo_eleitor.errors %}invalid{% endif %}">
+                        {{adm_form.titulo_eleitor}}
+                        <label>Título Eleitor<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.zona_titulo_eleitor.errors %}invalid{% endif %}">
+                        {{adm_form.zona_titulo_eleitor}}
+                        <label>Zona<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.secao_titulo_eleitor.errors %}invalid{% endif %}">
+                       {{adm_form.secao_titulo_eleitor}}
+                        <label>Seção<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-2">
+                     <div class="field {% if adm_form.carteira_habilitacao.errors %}invalid{% endif %}">
+                        {{adm_form.carteira_habilitacao}}
+                        <label>Cart. Habilitação<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.num_carteira_reservista.errors %}invalid{% endif %}">
+                        {{adm_form.num_carteira_reservista}}
+                        <label>Nº Cert. Reservista<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-4" style="grid-template-columns: calc(23% - 7.5px) calc(25% - 7.5px) calc(25% - 7.5px) calc(25% - 7.5px);">
+                    <div id="horario-trabalho"class="field">
+                        Horário de Trabalho:
+                    </div>
+                    <div class="field {% if adm_form.horario_trab_i.errors %}invalid{% endif %}">
+                        {{adm_form.horario_trab_i}}
+                        <label>Inicio<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.horario_trab_f.errors %}invalid{% endif %}">
+                        {{adm_form.horario_trab_f}}
+                        <label>Fim<span>:</span></label>
+                    </div>
+                    <div class="field {% if adm_form.horario_trab_intervalo.errors %}invalid{% endif %}">
+                        {{adm_form.horario_trab_intervalo}}
+                        <label>Intervalo<span>:</span></label>
+                    </div>
+                </div>
+                <div class="grid form-row-aux aux-7">
+                    <div class="input-file-container">  
+                        {{adm_form.cpf_file}}
+                        <label style="line-height: 80px;" tabindex="0" for="my-file" class="input-file-trigger">CPF</label>
+                        {% if adm_form.cpf_file.value %}
+                        <label id="label_id_cpf_file" class="hover-label"><a>{{adm_form.cpf_file.value}}</a></label>
+                        {% endif %}
+                    </div>
+                    <div  class="input-file-container">  
+                       {{adm_form.id_file}}
+                        <label style="line-height: 80px;" tabindex="0" for="my-file" class="input-file-trigger">RG</label>
+                        {% if adm_form.id_file.value %}
+                        <label id="label_id_id_file" class="hover-label"><a>{{adm_form.id_file.value}}</a></label>
+                        {% endif %}
+                    </div>
+                    <div  class="input-file-container">  
+                       {{adm_form.titulo_eleitor_file}}
+                        <label style="padding-top: 28px;" tabindex="0" for="my-file" class="conflict input-file-trigger">Titulo Eleitor</label>
+                        {% if adm_form.titulo_eleitor_file.value %}
+                        <label id="label_id_titulo_eleitor_file" class="hover-label"><a>{{adm_form.titulo_eleitor_file.value}}</a></label>
+                        {% endif %}
+                    </div>
+                    <div  class="input-file-container"> 
+                       {{adm_form.cart_reservista_file}}
+                        <label style="padding-top: 15px;" tabindex="0" for="my-file" class="input-file-trigger">Carteira Reservista</label>
+                        {% if adm_form.cart_reservista_file.value %}
+                        <label id="label_id_cart_reservista_file" class="hover-label"><a>{{adm_form.cart_reservista_file.value}}</a></label>
+                        {% endif %}                   
+                    </div>
+                    <div  class="input-file-container"> 
+                       {{adm_form.cert_nascimento_file}}
+                        <label style="padding-top: 15px;" tabindex="0" for="my-file" class="input-file-trigger">Certidão Nascimento</label>
+                        {% if adm_form.cert_nascimento_file.value %}
+                        <label id="label_id_cert_nascimento_file" class="hover-label"><a>{{adm_form.cert_nascimento_file.value}}</a></label>
+                        {%endif%}
+                    </div>
+                    <div class="input-file-container"> 
+                       {{adm_form.comp_residencia_file}}
+                        <label style="padding-top: 15px;" tabindex="0" for="my-file" class="input-file-trigger">Comp. Residência</label>
+                        {% if adm_form.comp_residencia_file.value %}
+                        <label id="label_id_comp_residencia_file" class="hover-label"><a>{{adm_form.comp_residencia_file.value}}</a></label>
+                        {%endif%}
+                    </div>
+                    <div  class="input-file-container">
+                        {{adm_form.cert_nascimento_filho_file}}
+                        <label style="padding-top: 5px;" tabindex="0" for="my-file" class="input-file-trigger">Cert. Nascimento Filhos</label>
+                        {% if adm_form.cert_nascimento_filho_file.value %}
+                        <label id="label_id_cert_nascimento_filho_file" class="hover-label"><a>{{adm_form.cert_nascimento_filho_file.value}}</a></label>
+                        {%endif%}
+                    </div>
+                </div>
+                <div>
+                    <input type="submit" class="btn padrao-btn" style="width:120px;float:right; margin-right: 20px;margin-top: 30px; margin-bottom: 30px" value="Enviar" formnovalidate>
+                </div>
+            </div>
+        </form>
+        {% if request.user.is_RH or request.user.is_manager %}
+        <div style="margin-top:30px;" class="table-title-wrapper">
+            <h2 class="table-title" {% if request.user.is_RH or request.user.is_manager %} onclick="toggle_d_none('#dados-colaborador')" {% endif %}>Dados do Colaborador</h2>
+        </div>
+        <div id="dados-colaborador" class="grid">
+            <div class="perm-wrapper">
+                <h4 class="table-title">Permissões</h4>
+                <form method="POST" action="/HRP/perfil/change_perm/{{pk}}/">
+                {% csrf_token %}
+                    <label class="singleOption">Executor:
+                        <input name='is_executor' class="singleOptionInput" type="checkbox" {% if user.is_executor %} checked="checked" {%endif%}>
+                    </label>
+                    <label class="singleOption">RH:
+                        <input name='is_RH' class="singleOptionInput" type="checkbox" {% if user.is_RH %} checked="checked" {%endif%}>
+                    </label>                    
+                    <label class="singleOption">Financeiro:
+                        <input name='is_financeiro'class="singleOptionInput" type="checkbox" {% if user.is_financeiro %} checked="checked" {%endif%}>
+                    </label>                    
+                    <label class="singleOption">Gerente:
+                        <input name='is_manager' class="singleOptionInput" type="checkbox" {% if user.is_manager %} checked="checked" {%endif%}>
+                    </label>
+                    <input style="right: 20px; position: relative; float: right; margin-top: 0px; width: 70px;" type="submit" class="btn padrao-btn">
+                </form>
+            </div>
+            <div class="perm-wrapper">
+                <h4 class="table-title">Contratos</h4>
+                <table class="table-profile" style="width: 100%;" id="contratos">
+                    <thead>
+                        <tr>
+                            <th>Data de Início</th>
+                            <th>Data de Termino</th>
+                            <th>Contrato</th>
+                            <th>Remunerção - Tipo</th>
+                            <th style="text-align:center; width: 30px">Férias</th>
+                            <th style="text-align:center; width: 70px">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contrato in contratos %}
+                        <form action="/HRP/perfil/edit_contrato/{{contrato.id}}/" id="form{{contrato.id}}"method="POST">
+                        {% csrf_token %}
+                        <tr>
+                            <td><input name="data_i" type="text" class="datepicker" value="{{contrato.data_i|date:'d/m/Y'}}"></td>
+                            <td><input name="data_f" type="text" class="datepicker" {%if contrato.data_f == None %} placeholder="Contrato Vigente"{% else %} value="{{contrato.data_f|date:'d/m/Y'}}"{% endif %}"></td>
+                            <td>
+                                <select name = "modelo-contrato">
+                                        {% for modelo_contrato in modelo_contratos %}
+                                        <option value='{{ modelo_contrato.id }}' {% if contrato.modelo.id == modelo_contrato.id %} selected {% endif %}> {{ modelo_contrato.modalidade }} - {{ modelo_contrato.carga_horaria }}h </option>
+                                        {% endfor %}
+                                </select>
+                            </td>
+                            <td> 
+                                <input style="width: 45%; text-align: center;"name="remuneracao" type="number" step=".01" value="{{contrato.remuneracao}}">
+                                -
+                                <input style="width: 45%;text-align: center;" name="tipo_remuneracao" type="text" placeholder="mensal/semanal" value="{{contrato.tipo_remuneracao}}">
+                            </td>
+                            <td> <input name="ferias" type="number" step="1" value="{{contrato.direito_ferias}}"></td>
+                            <td>
+                                <button type="submit" form="form{{contrato.id}}" style="margin-bottom: 3px"class="btn">{% octicon 'cloud-upload' class='octicon' %}</button>
+                                <a href="/HRP/perfil/del_contrato/{{contrato.id}}/" style="position: relative;top: 3px" onclick="return confirm('Essa operação excluirá permanentemente este registro. Deseja prosseguir?')">{% octicon 'remove' class='octicon'%}</span></a>
+                            </td>
+                        </tr>
+                        </form>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block childscript %}
+    {% if request.user.is_RH or request.user.is_manager %}
+    function toggle_d_none(selector){
+        $(selector).toggleClass("d-none");
+    }
+        {% if src != "adm" %}
+        toggle_d_none("#formulario-admissao");
+        {% endif %}
+        
+        {% if src != "dados" %}
+        toggle_d_none("#dados-colaborador");
+        {% endif %}
+
+    {% endif %}
+    var dtpicker = $("#data-form .field:not(.invalid) .datepicker");
+    lgt = dtpicker.length;
+    for(i=0;i < lgt; i++){
+        aux = dtpicker[i].value;
+        if(aux != ""){
+        aux = aux.split(" ")[0].split("-");
+        aux = aux[2] + "/" + aux[1] + "/" + aux[0];
+        dtpicker[i].value = aux;
+        }   
+    }
+
+    {% if errorlog %}
+        window.onload = function(){
+            alert("{{errorlog}}");
+        };
+    {% endif %}
+    $(".octicon").mouseenter(function(e){
+        $(this).toggleClass("octicon-blue");
+    });
+    $(".octicon").mouseleave(function(e){
+        $(this).toggleClass("octicon-blue");
+    });
+
+    function parse_date(datestring) {
+        datearr = datestring.split('/')
+        return new Date(datearr[2], datearr[1]-1, datearr[0])
+    }
+
+    function ferias_form_validation(){
+        var data_i = $("#ferias_data_i").val();
+        var data_f = $("#ferias_data_f").val();
+
+        if( parse_date(data_i) >= parse_date(data_f) ){
+            
+            alert("A data de inicio não pode ser menor que a data de fim das férias.");
+            return false;
+        }
+        return true;
+    }
+
+    $( function() {
+        $.each($(".datepicker"), function(i,l){
+            var aux = $(l).val();
+            $(l).datepicker( {
+                monthNames: [ "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" ],
+                monthNamesShort: [ "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" ],
+                dateFormat: "dd/mm/yy",
+                changeMonth: true,
+                changeYear: true,
+                currentText: "Hoje",
+                closeText: "Pronto",
+                showButtonPanel: true,
+                onClose: function(dateText, inst) {
+                    
+                    
+                    function isDonePressed(){
+                        return ($('#ui-datepicker-div').html().indexOf('ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all ui-state-hover') > -1);
+                    }
+                    
+                    if (isDonePressed()){
+                        var day = $("#ui-datepicker-div .ui-datepicker-date :selected").val();
+                        var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                        var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                        $(this).datepicker('setDate', new Date(year, month, day)).trigger('change');
+                        
+                        $('.date-picker').focusout()//Added to remove focus from datepicker input box on selecting date
+                    }
+                },
+                beforeShow : function(input, inst) {
+                    
+                    inst.dpDiv.addClass('month_year_datepicker')
+                    
+                    if ((datestr = $(this).val()).length > 0) {
+                        year = datestr.substring(datestr.length-4, datestr.length);
+                        month = datestr.substring(3, 5);
+                        day = datestr.substring(0, 2);
+                        $(this).datepicker('option', 'defaultDate', new Date(year, month-1, day));
+                        $(this).datepicker('setDate', new Date(year, month-1, day));
+                        $(".ui-datepicker-calendar").hide();
+                    }
+                }
+            });
+            $(l).val(aux);
+        });
+        
+        $.each($(".meta-value"), function(i,l){
+            var aux = $(l).val();
+            aux = aux.replace(".", ",");
+            $(l).val(aux);
+        });
+    });
+
+    //function change_file_label(input){
+    //    $("label_" + input.id).innerText = input.value;
+    //}
+
+    inputs = $("#data-form input[type='file']");
+    lgt = inputs.length;
+    for (i = 0; i < lgt; i++){
+        
+        //Selecting the file input HTML
+        div = inputs[i].parentElement;
+        aux = div.innerHTML.split("Change:");
+        div.innerHTML = aux[aux.length-1].replace("docsAdmissionais/","");
+
+        try{
+            aux = div.children[2].children[0];
+            aux.href = "/HRP/download/?path=docsAdmissionais/" + aux.innerText;
+        }catch(err){
+            aux = ""
+        }
+        //Adding onchange event
+        //inputs[i].change(change_file_label(inputs[i]));
+    }
+
+    function profile_pic_click(){
+        $("#profile-pic-input").click();
+    }
+
+    function submit_profile_pic_form(){
+        $("#profile-pic-form").submit();
+    }
+
+    var expanded = false;
+    var options = document.getElementById("selectOptions");
+    var select = $('.select-multiselect');
+    
+
+    document.addEventListener("click", function(event) {
+
+        // If user clicks inside the element, do nothing
+        if(event.target.classList[0] == "selectWrapper"){
+            select.toggleClass('multiselect-collapsed');
+            if (!expanded) {
+                options.style.display = "block";
+                expanded = true;
+            } else {
+                options.style.display = "none";
+                expanded = false;
+            }
+        }else if(event.target.classList[0] == "singleOption" || event.target.classList[0] == "singleOptionInput"){
+            return;
+        }else if (expanded) {
+            select.toggleClass('multiselect-collapsed');
+            options.style.display = "none";
+            expanded = false;
+        }
+        console.log(event.target.classList)
+    });
+{% endblock %}
+

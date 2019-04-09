@@ -1,0 +1,10 @@
+@import compass
+
+.ui-datepicker td span, .ui-datepicker td a 
+  text-align: center
+
+.ui-widget-content .ui-state-default
+  background: darken(#E6E6E6, 20%) url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x
+
+.ui-state-default.ui-state-active
+  background: lighten(#E6E6E6, 10%) url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x

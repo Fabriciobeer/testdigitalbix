@@ -1,0 +1,407 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/controle.css' %}">
+{% endblock %}
+
+
+{% block base-content %}
+
+<datalist id="areas_possiveis">
+    {% for area in areas_possiveis %}    
+    <option> {{area}} </option>
+    {% endfor %}
+</datalist>
+
+<div class="wrapper">
+
+    <div class = "table-container" id="novo_colaborador">
+        <h2 class="table-title"> Novo Cliente </h2>
+        <form action="/CRP/controle/add/" method="post" id="form-novo"class="form-novo" >
+        {% csrf_token %}
+        <div class="grid-container-crp" id="t-grid">
+            <div class="field">
+                <select name = "empresa" id="empresanovo" onchange="select_change();">
+                    <option value="" style="color: grey" hidden selected>Empresa</option>
+                    {% for empresa in empresas %}
+                    <option value="{{empresa.id}}"> {{empresa.nome}} </option>
+                    {% endfor %}
+                    <option value="outro" style="font-weight: 600;"> Nova Empresa </option>
+                </select>
+                <label id="label-select">Empresa</label>    
+                <span class="select-value" id="span-cargo"></span>
+                <input type="text"  name="outro" id="outronovo" class="d-none" required>
+                <label id="label-input" class="d-none">Empresa</label>
+                {% octicon 'triangle-left' id="iconenovo" class="d-none" style="position:relative;left:48.5%;top:48px;" onclick="hidetextbox('novo')" %}
+            </div>
+            <div id="add-options" class="field">
+               <span id="btn-area" class="btn empresa-sub padrao-btn" onclick="toggle_cnpj_area('area');"> Área </span>
+               <span id="btn-cnpj" class="btn empresa-sub padrao-btn btn-top" onclick="toggle_cnpj_area('cnpj');"> CNPJ </span>
+            </div>
+            <div id="field-razao-social"class="field v-hidden">
+                <input type="text"  id="razao-social"name="razao_social" required>
+                <label>Razão Social</label>
+            </div>
+            <div id="input-area" class="field d-none">
+               <input class="d-none" type="checkbox" id="area-flag" name="area-flag">
+               <input type="text" list="areas_possiveis" id="area-input" name="area"  required>
+               <label> Area </label>
+            </div>
+            <div id="input-cnpj" class="field d-none">
+                <input class="d-none" type="checkbox" id="cnpj-flag" name="cnpj-flag">
+                <input type="text" name="cnpj" id="cnpj-input" required>
+                <label> CNPJ </label>
+            </div>
+            <button formnovalidate onclick="validate_horario_form('novo');" type="button" id="btn-novo-crp" class="btn padrao-btn">Enviar</button>
+        </div>        
+        </form>
+    </div>
+
+    <div class = "table-container">
+        <h2 class="table-title" id="empresa_h2" onclick="showHideDiv('empresas_atuais')" style="cursor: pointer;"> Empresas Ativas </h2>
+        <!-- Essa form está aqui, porque o HTML não permite nested forms. Então, cada vez que o checkbox da form de cada linha mudar, seu valor será atualizado nesta form-->
+        <form class="d-none" id="merge-empresas" method="POST" action="/CRP/merge_empresas/">
+            {% csrf_token %}
+            {% for empresa in empresas %}
+            <input class="checkbox-registro" onchange="checkbox_change({{empresa.id}})" id="checkbox{{empresa.id}}" name="selected-{{empresa.id}}" type="checkbox" hidden>
+            {% endfor %}
+        </form>
+        <div class="table-responsive" style="display:none;" id="empresas_atuais">
+            <div style="width: 160px; text-align: center;" class="title-wrapper-timesheet-r">
+                <h2 style="margin-top: 0px;" class="table-title table-title-timesheet"> Ação: </h2>
+                <select class="select-registro" id="acao-form-val" name="acao" style="width: 100%;">
+                    <option value="del">Mesclar Empresas</option>
+                </select>
+                <button type="submit" form="" onclick="submit_selecao()" class="btn" id="btn-timesheet" style="margin-bottom: 30px">Aplicar</button>
+            </div>
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Razão Social</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    {% for empresa in empresas %}
+                    <tr>
+                        <form action="/CRP/controle/edit/?pk={{empresa.id}}&fonte=empresa" method="post" id="formemp{{empresa.id}}">
+                            {% csrf_token %}
+                            <td>
+                                <input type="text" name="empresa" id="nome{{empresa.id}}" value="{{empresa.nome}}" class="outro-crp">
+                            </td>
+                            <td> 
+                                <input type="text" name="razao_social" value="{{empresa.razao_social}}"\>
+                            </td>
+                            <td>
+                                <div class="td-acoes">
+                                    <div class = "wrapper-acao-3obj">
+                                        <input class="checkbox-registro" onchange="checkbox_change({{empresa.id}})" type="checkbox">
+                                    </div>
+                                    <div class = "wrapper-acao-3obj" style="position: relative; left: 6.5px; top: 0px;"> 
+                                        <a href="/CRP/controle/inativar/?pk={{empresa.id}}&fonte=empresa" class="del-registro">{% octicon 'remove' class='ociticon'%}</span></a>
+                                    </div>
+                                    <div class = "wrapper-acao-3obj" style="position: relative; bottom: 2px;">
+                                        <button type="submit" form="formemp{{empresa.id}}" class="btn">{% octicon 'cloud-upload' class='ociticon' %}</button>
+                                    </div>
+                                    
+                                </div>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class = "table-container">
+        <h2 class="table-title" id="area_h2" onclick="showHideDiv('areas_atuais')" style="cursor: pointer;"> Áreas Ativas </h2>
+        <div class="table-responsive" style="display:none;" id="areas_atuais">
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Área</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    {% for area_empresa in areas_empresas %}
+                    <tr>
+                        <form action="/CRP/controle/edit/?pk={{area_empresa.id}}&fonte=area" method="post" id="formarea{{area_empresa.id}}">
+                            {% csrf_token %}
+                            <td>
+                                <select name = "empresa" id="empresa{{area_empresa.id}}">
+                                    {% for empresa in empresas %}
+                                    <option value="{{empresa.id}}" {% if area_empresa.empresa.id == empresa.id %} selected {% endif %}> {{empresa.nome}} </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td> 
+                                <input type="text" name="area" list="areas_possiveis" value="{{area_empresa.nome}}"\>
+                            </td>
+                            <td>
+                                <button type="submit" form="formarea{{area_empresa.id}}" class="btn">{% octicon 'cloud-upload' class='ociticon' %}</button>
+                                <a href="/CRP/controle/inativar/?pk={{area_empresa.id}}&fonte=area" class="btn">{% octicon 'remove' class='ociticon'%}</span></a>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class = "table-container">
+        <h2 class="table-title" id="cnpj_h2" onclick="showHideDiv('cnpjs_atuais')" style="cursor: pointer;"> CNPJs Ativos </h2>
+        <div class="table-responsive" style="display:none;" id="cnpjs_atuais">
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th>Empresa</th>
+                        <th>CNPJ</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    {% for cnpj in cnpjs %}
+                    <tr>
+                        <form action="/CRP/controle/edit/?pk={{cnpj.id}}&fonte=cnpj" method="post" id="formcnpj{{cnpj.id}}">
+                            {% csrf_token %}
+                            <td>
+                                <select name = "empresa" id="empresa{{cnpj.id}}">
+                                    {% for empresa in empresas %}
+                                    <option value="{{empresa.id}}" {% if cnpj.empresa.id == empresa.id %} selected {% endif %}> {{empresa.nome}} </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td> 
+                                <input type="text" name="cnpj" class="cnpj-td-input" maxlength="14" value="{{cnpj.cnpj}}">
+                            </td>
+                            <td>
+                                <button type="submit" form="formcnpj{{cnpj.id}}" class="btn">{% octicon 'cloud-upload' class='ociticon'%}</button>
+                                <a href="/CRP/controle/inativar/?pk={{cnpj.id}}&fonte=cnpj" class="btn">{% octicon 'remove' class='ociticon' %}</span></a>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class = "table-container" style="margin-bottom: 50px;">
+        <h2 class="table-title" id="projeto_h2" onclick="showHideDiv('projetos_atuais')" style="cursor: pointer;"> Projetos Ativos </h2>
+        <div class="table-responsive" style="display:none;" id="projetos_atuais">
+            <table class="table table-striped">      
+                <thead class="thead-dark"> 
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Projeto</th>
+                        <th class="th-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    {% for projeto in projetos %}
+                    <tr>
+                        <form action="/CRP/controle/edit/?pk={{projeto.id}}&fonte=projeto" method="post" id="formprojeto{{projeto.id}}">
+                            {% csrf_token %}
+                            <td>
+                                <select name = "empresa" id="empresa{{projeto.id}}">
+                                    {% for empresa in empresas %}
+                                    <option value="{{empresa.id}}" {% if projeto.empresa.id == empresa.id %} selected {% endif %}> {{empresa.nome}} </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td> 
+                                <input type="text" name="projeto" class="cnpj-td-input" maxlength="14" value="{{projeto.descricao}}">
+                            </td>
+                            <td>
+                                <button type="submit" form="formprojeto{{projeto.id}}" class="btn">{% octicon 'cloud-upload' class='ociticon'%}</button>
+                                <a href="/CRP/controle/inativar/?pk={{projeto.id}}&fonte=projeto" class="btn">{% octicon 'remove' class='ociticon' %}</span></a>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block childscript %}
+    
+    function submit_selecao(){
+        $('#merge-empresas').submit();
+    }
+
+    $(".octicon").mouseenter(function(e){
+        $(this).toggleClass("octicon-blue");
+    });
+    $(".octicon").mouseleave(function(e){
+        $(this).toggleClass("octicon-blue");
+    });
+
+    var cnpj_clicked =  false;
+    var area_clicked =  false;
+    function toggle_cnpj_area(id){
+        if(id=='cnpj'){
+            if(area_clicked){
+                $("#btn-area").removeClass('btn-sub-clicked');
+                area_clicked = false;
+                $("#area-flag").attr('checked', false);
+                $("#input-area").addClass('d-none');
+            }
+            cnpj_clicked = !cnpj_clicked;
+            $("#cnpj-flag").attr('checked', cnpj_clicked);
+            if(cnpj_clicked){
+                $("#btn-cnpj").addClass('btn-sub-clicked');
+                $("#input-cnpj").removeClass('d-none');
+            }else{
+                $("#btn-cnpj").removeClass('btn-sub-clicked');
+                $("#input-cnpj").addClass('d-none');
+            }
+        }else{
+            if(cnpj_clicked){
+                $("#btn-cnpj").removeClass('btn-sub-clicked');
+                cnpj_clicked = false;
+                $("#cnpj-flag").attr('checked', cnpj_clicked);
+                $("#input-cnpj").addClass('d-none');
+            }
+            area_clicked = !area_clicked;
+            $("#area-flag").attr('checked', area_clicked);
+            if(area_clicked){
+                $("#btn-area").addClass('btn-sub-clicked');
+                $("#input-area").removeClass('d-none');
+            }else{
+                $("#btn-area").removeClass('btn-sub-clicked');
+                $("#input-area").addClass('d-none');
+            }
+        }
+        if(cnpj_clicked || area_clicked){
+            $("#empresanovo option[value='outro']").attr('disabled','disabled');
+            $("#empresanovo option[value='outro']").css('color','grey'); 
+        }else{
+            $("#empresanovo option[value='outro']").css('color','black');
+            $("#empresanovo option[value='outro']").removeAttr('disabled');
+        }
+
+    }
+
+    function showtextbox(id){
+        if($('#empresa'+id).val() == "outro"){
+            $('#empresa'+id).addClass('d-none');
+            $('#outro'+id).removeClass('d-none');
+            $('#outro'+id).focus();
+            $('#icone'+id).removeClass('d-none');
+        }
+    }
+
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var fonte = url.searchParams.get("fonte");
+    if(fonte){
+        showHideDiv(fonte+"s_atuais")
+    }
+    var confirmlog = url.searchParams.get("confirmlog"); 
+    if(confirmlog != null){
+        var id = url.searchParams.get("id");
+        var fonte_r = url.searchParams.get("fonte_r");
+        var action = confirm(confirmlog);
+        if(action == true){
+            window.location.href = '/CRP/controle/reativar?id='+id+'&fonte='+fonte_r;
+        }
+    }
+    function showHideDiv(id){
+        element_style = document.getElementById(id).style
+        if(element_style.display == "none") {
+            element_style.display="block";
+        } else {
+            element_style.display="none";
+        }
+    }
+
+    select_valid_flag = true;
+
+    function select_change(){
+        if (select_valid_flag){
+            $("#empresanovo").addClass("valid");
+            select_valid_flag = false;
+        }
+        //setTimeout(function(){
+        $('#span-cargo').html($('#empresanovo option:selected').text());
+        //}, 70);
+
+        if($('#empresanovo').val() == "outro"){
+            $('#empresanovo').addClass('d-none');
+            $('#outronovo').removeClass('d-none');
+            $('#outronovo').focus();
+            $('#iconenovo').removeClass('d-none');
+            $('#span-cargo').addClass('d-none');
+            $('#label-select').addClass('d-none');
+            $('#label-input').removeClass('d-none');
+            $("#empresanovo").removeClass("valid");
+            $("#field-razao-social").removeClass('v-hidden');
+            $(".empresa-sub").addClass("blocked-button");
+            select_valid_flag = true;
+        }
+    }
+    
+    function validate_horario_form(id){
+        var flag = true;
+        
+        if ($('#empresanovo').val() == "outro"){
+            if($('#outronovo').val() == "" || $('#razao-social').val() == ""){
+                flag = false;
+            }
+        }else if($('#empresanovo').val() == ""){
+            flag = false;
+        }
+        if($('#empresanovo').val() != "" && $('#area-input').val() != ""){
+            if($('#area-flag').prop('checked') && $('#area-input').val() == ""){
+                flag = false;
+            }
+            if($('#cnpj-flag').prop('checked') && $('#cnpj-input').val() == ""){
+                flag = false;
+            }
+        }
+        if (flag){
+            $("#form-novo").submit()
+        }else{
+            alert("Erro no formulário de adicionar Área de Empresa");
+            return false;
+        }
+    }
+
+    
+
+	function hidetextbox(id){
+		$('#empresa'+id).removeClass('d-none');
+		$('#outro'+id).addClass('d-none');
+        $('#icone'+id).addClass('d-none');
+        $('#empresa'+id).val('');
+        if(id=='novo'){
+            $('#span-cargo').removeClass('d-none');
+            $('#label-select').removeClass('d-none');
+            $('#label-input').addClass('d-none');
+            $('#span-cargo').html('');
+            $("#field-razao-social").addClass('v-hidden');
+            $(".empresa-sub").removeClass("blocked-button");
+        }
+    }   
+    
+    
+    function change_placeholder(){
+        
+    }
+
+    function checkbox_change(id){
+        var checkBox = $("#checkbox"+id); 
+        checkBox.prop("checked", !checkBox.prop("checked"));
+    }
+{% endblock %}

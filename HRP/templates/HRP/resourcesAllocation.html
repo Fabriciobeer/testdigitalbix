@@ -1,0 +1,537 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/resources.css' %}">
+<link rel="stylesheet" href="{% static 'css/assets/multiselect.css' %}">
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<!-- <script src="{% static 'HRP/resourcesAllocation.js' %}"></script> -->
+{% endblock %}
+
+{% block base-content %}
+
+<div class="wrapper">
+    <div class = "table-container" id="allocation-table">
+        
+        <div id='timeline-range' class="grid-container" >
+            <div class="field" id="title">
+                <div>
+                    <h2 class="table-title"> Alocação </h2>
+                </div>
+            </div>
+            <div class="field">
+                <input type="text" name="timeline-start-date" id="timeline-start-date" class="datepicker" value='' autocomplete="off" onchange='updateTimelineRange()' required>
+                <label>Primeira Data</label>
+            </div>
+            <div class="field">
+                <input type="text" name="timeline-end-date" id="timeline-end-date" class="datepicker" value='' autocomplete="off" onchange='updateTimelineRange()' required>
+                <label>Última Data</label>
+            </div>
+        </div>
+        
+        <div id="timeline"></div>
+
+        <button onclick="del_allocation()" id="btn-del-allocation" class="btn">{% octicon "trashcan" %}</button>
+        
+        <!-- <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th class="th-resource">Nome</th>
+                        <th class="th-project">Projeto</th>
+                        <th class="th-date">Data de Início</th>
+                        <th class="th-date">Data de Término</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    {% for allocation in allocations %}
+                    <tr>
+                        <td>{{ allocation.resource.nome }}</td>
+                        <td>{{ allocation.project }}</td>
+                        <td>{{ allocation.start_date|date:"d/m/Y" }}</td>
+                        <td>{{ allocation.end_date|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> -->
+        
+    </div>
+
+    <div class = "table-container" id="add-allocation">
+        <h2 class="table-title"> Adicionar </h2>
+        <form class="form-novo" id="add-allocation-form" action="/HRP/allocation/add_allocation/" method="post">
+        {% csrf_token %}
+        <div class="grid-container" id="t-grid">
+            <div class="field"  id="resource">
+                <select name="resource" id="resource-select" type="text" onchange="change_span_html();" required>
+                    <option selected hidden></option>
+                    {% for colaborador in colaboradores %}
+                    <option style="color:black;" value="{{colaborador.nome}}">{{colaborador.nome}}</option>
+                    {% endfor %}
+                </select>
+                <label>Nome</label>
+                <span class="select-value" id="span-resource"></span>
+            </div>
+            <div class="field" id="project">
+                <!-- <input name="project" type="text" required> -->
+                <select name="project" id="project-select" type="text" onchange="change_span_project();" required>
+                    <option selected hidden></option>
+                    {% for projeto in projetos %}
+                    <option style="color:black;" value="{{projeto.id}}">{{projeto.empresa}} - {{projeto.descricao}}</option>
+                    {% endfor %}
+                </select>
+                <label>Projeto</label>
+                <span class="select-value" id="span-project"></span>
+            </div>
+            <div class="field">
+                <input type="text" name="start-date" id="start-date" class="datepicker" value='' autocomplete="off" required>
+                <label>Data de Início</label>
+            </div>
+            <div class="field">
+                <input type="text" name="end-date" id="end-date" class="datepicker" value='' autocomplete="off" required>
+                <label>Data de Término</label>
+            </div>
+        </div>
+        </form>
+    <button onclick="submit_allocation()" id="btn-add-allocation" class="btn padrao-btn">Adicionar</button>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block childscript %}
+
+$('#is-manager').change(function(){
+    $('#is-manager-div').toggleClass('placeholder');
+    $('#is-manager-div').toggleClass('checked');
+});
+
+$(".octicon").mouseenter(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+$(".octicon").mouseleave(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+
+
+
+var expanded = false;
+var options = document.getElementById("selectOptions");
+var select = $('.select-multiselect');
+
+
+document.addEventListener("click", function(event) {
+    // If user clicks inside the element, do nothing
+    if(event.target.classList[0] == "selectWrapper"){
+        select.toggleClass('multiselect-collapsed');
+        if (!expanded) {
+            options.style.display = "block";
+            expanded = true;
+        } else {
+            options.style.display = "none";
+            expanded = false;
+        }
+    }else if(event.target.classList[0] == "singleOption" || event.target.classList[0] == "singleOptionInput"){
+        return;
+    }else if (expanded) {
+        select.toggleClass('multiselect-collapsed');
+        options.style.display = "none";
+        expanded = false;
+    }
+    console.log(event.target.classList)
+});
+
+$( function() {
+    $.each($(".datepicker"), function(i,l){
+        var aux = $(l).val();
+        $(l).datepicker( {
+            monthNames: [ "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro" ],
+            monthNamesShort: [ "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez" ],
+            dateFormat: "dd/mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            currentText: "Hoje",
+            closeText: "Pronto",
+            showButtonPanel: true,
+            onClose: function(dateText, inst) {
+                
+                
+                function isDonePressed(){
+                    return ($('#ui-datepicker-div').html().indexOf('ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all ui-state-hover') > -1);
+                }
+                
+                if (isDonePressed()){
+                    var day = $("#ui-datepicker-div .ui-datepicker-date :selected").val();
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, day)).trigger('change');
+                    
+                    $('.date-picker').focusout()//Added to remove focus from datepicker input box on selecting date
+                }
+            },
+            beforeShow : function(input, inst) {
+                
+                inst.dpDiv.addClass('month_year_datepicker')
+                
+                if ((datestr = $(this).val()).length > 0) {
+                    year = datestr.substring(datestr.length-4, datestr.length);
+                    month = datestr.substring(3, 5);
+                    day = datestr.substring(0, 2);
+                    $(this).datepicker('option', 'defaultDate', new Date(year, month-1, day));
+                    $(this).datepicker('setDate', new Date(year, month-1, day));
+                    $(".ui-datepicker-calendar").hide();
+                }
+            }
+        });
+        $(l).val(aux);
+    });
+    
+    $.each($(".meta-value"), function(i,l){
+        var aux = $(l).val();
+        aux = aux.replace(".", ",");
+        $(l).val(aux);
+    });
+});
+
+select_valid_flag = true;
+function change_span_html(){
+    if (select_valid_flag){
+        $("#resource-select").addClass("valid");
+        select_valid_flag = false;
+    }
+    $('.select-value#span-resource').html($('#resource-select option:selected').text());
+}
+
+select_valid_project_flag = true;
+function change_span_project(){
+    if (select_valid_project_flag){
+        $("#project-select").addClass("valid");
+        select_valid_project_flag = false;
+    }
+    $('.select-value#span-project').html($('#project-select option:selected').text());
+}
+
+function parse_date(datestring) {
+    datearr = datestring.split('/')
+    return new Date(datearr[2], datearr[1]-1, datearr[0])
+}
+
+function parse_start_date(datestring) {
+    datearr = datestring.split('/')
+    return new Date(datearr[2], datearr[1]-1, datearr[0], 0, 0, 0)
+}
+
+function parse_end_date(datestring) {
+    datearr = datestring.split('/')
+    return new Date(datearr[2], datearr[1]-1, datearr[0], 23, 59, 59)
+}
+
+function submit_allocation(event) {
+    var error_log = 'Erros: \n';
+    var valid = true;
+
+    // start_date = $('#start-date').val().split('/')
+    // start_date = new Date(start_date[2], start_date[1]-1, start_date[0])
+    start_date = parse_date($('#start-date').val())
+    // end_date = $('#end-date').val().split('/')
+    // end_date = new Date(end_date[2], end_date[1]-1, end_date[0])
+    end_date = parse_date($('#end-date').val())
+    now = new Date()
+    today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    if (start_date > end_date) {
+        valid = false;
+        error_log += "- A data de término não deve ser anterior à data de início\n";
+    } 
+    // Removed because it was not needed
+    // else if (end_date < today) {
+    //     valid = false;
+    //     error_log += "- Você não pode reservar recursos para datas passadas\n";
+    // }
+
+    busy = is_resource_available($('#resource-select').val(), start_date, end_date)
+    if (busy.length > 0) {
+        valid = false;
+        for (var i=0; i < busy.length; i++) {
+            start_date_busy = busy[i].start_date.getDate()+"/"+(busy[i].start_date.getMonth()+1)+"/"+busy[i].start_date.getFullYear()
+            end_date_busy = busy[i].end_date.getDate()+"/"+(busy[i].end_date.getMonth()+1)+"/"+busy[i].end_date.getFullYear()
+            error_log += "- O recurso encontra-se indisponível de "+start_date_busy+" até "+end_date_busy+" \n"
+        }
+    }
+
+    if (valid) {
+        $('#add-allocation-form').submit();
+    } else {
+        alert(error_log);
+    }
+
+    return valid
+}
+
+var allocations = [];
+{% for allocation in allocations %}
+allocations.push({
+    resource: "{{allocation.resource}}",
+    project: "{{allocation.project}}",
+    start_date: parse_date("{{ allocation.start_date|date:'d/m/Y' }}"),
+    end_date: parse_date("{{ allocation.end_date|date:'d/m/Y' }}")
+})
+{% endfor %}
+
+function is_resource_available(resource, start_date, end_date) {
+    var busy = [];
+
+    for (var i=0; i < allocations.length; i++) {
+        if (allocations[i].resource == resource) {
+            alloc_start = allocations[i].start_date
+            alloc_end = allocations[i].end_date
+            if (start_date >= alloc_start) {
+                if (start_date <= alloc_end) {
+                    busy.push(allocations[i]);
+                } 
+            } else if (end_date >= alloc_start) {
+                busy.push(allocations[i]);
+            }
+        }
+    }
+
+    return busy
+}
+
+// var mouseX;
+// var mouseY;
+// var rects = Array.from(document.querySelectorAll('rect'));
+// rects.forEach(function(r) {
+//     r.addEventListener('mousemove', function(e) {
+//         mouseX = e.pageX;
+//         mouseY = e.pageY;
+//     });
+// })
+// document.addEventListener('mousemove', function(e) {
+//     mouseX = e.pageX;
+//     mouseY = e.pageY;
+// });
+
+// GOOGLE TIMELINE CHART
+
+google.charts.load('current', {'packages':['timeline']});
+google.charts.setOnLoadCallback(drawChart);
+function drawChart(axis_start_date=new Date((new Date()).getFullYear(), (new Date()).getMonth(), (new Date()).getDate()), axis_end_date=new Date((new Date()).getFullYear(), (new Date()).getMonth() +5, (new Date()).getDate())) {
+    var container = document.getElementById('timeline');
+    chart = new google.visualization.Timeline(container);
+    dataTable = new google.visualization.DataTable();
+
+    dataTable.addColumn({ type: 'string', id: 'Colaborador' });
+    dataTable.addColumn({ type: 'string', id: 'Cliente' });
+    dataTable.addColumn({ type: 'string', role: 'tooltip', 'p': {'html': true}});
+    dataTable.addColumn({ type: 'date', id: 'Início' });
+    dataTable.addColumn({ type: 'date', id: 'Fim' });
+    {% for allocation in allocations %}
+    project_start_date = parse_start_date("{{ allocation.start_date|date:"d/m/Y" }}")
+    project_end_date = parse_end_date("{{ allocation.end_date|date:"d/m/Y" }}")
+    
+    if (project_end_date >= axis_start_date && project_start_date <= axis_end_date) {
+        if (axis_start_date != null){
+            start_date = new Date(Math.max(project_start_date, axis_start_date))
+        } else {
+            start_date = project_start_date
+        }
+        if (axis_end_date != null) {
+            end_date = new Date(Math.min(project_end_date, axis_end_date))
+        } else {
+            end_date = project_end_date
+        }
+        dataTable.addRow([
+            "{{allocation.resource}}",
+            "{{allocation.project.empresa}}",
+            returnTooltip("{{allocation.project.empresa}}", "{{allocation.project.descricao}}", "{{ allocation.start_date|date:"d/m/Y" }}", "{{ allocation.end_date|date:"d/m/Y" }}"),
+            start_date,
+            end_date
+        ])
+    }
+    {% endfor %}
+    
+    var today = new Date();
+    var options = {
+        timeline: { colorByRowLabel: true },
+        forceIFrame: true,
+        hAxis: {
+            minValue: axis_start_date,
+            maxValue: axis_end_date,
+        },
+        avoidOverlappingGridLines: true,
+        tooltip: { isHtml: true }
+    };
+
+    // Updates data range selectors
+    document.getElementById('timeline-start-date').value = axis_start_date.getDate()+"/"+(axis_start_date.getMonth()+1)+"/"+axis_start_date.getFullYear();
+    document.getElementById('timeline-end-date').value = axis_end_date.getDate()+"/"+(axis_end_date.getMonth()+1)+"/"+axis_end_date.getFullYear();
+
+    // Changes tooltip position
+    google.visualization.events.addOneTimeListener(chart, 'ready', function () {
+        var container = document.querySelector('#timeline > div:last-child');
+        function setPosition(e) {
+            var tooltip = $("#allocation-tooltip");
+            //var left = mouseX - tooltip.parent.offset().left;
+            //var top = mouseY - tooltip.parent.offset().top;
+            var top = Math.min(document.getElementById('timeline').getBoundingClientRect().bottom, document.body.getBoundingClientRect().height - document.getElementById('allocation-tooltip').getBoundingClientRect().height);
+            var left = document.body.getBoundingClientRect().width/2 - document.getElementById('allocation-tooltip').getBoundingClientRect().width/2;
+
+            tooltip.css('top', top);
+            tooltip.css('left', left);
+        }
+        if (document.addEventListener) {
+          container.addEventListener('DOMNodeInserted', setPosition);
+        }
+        else {
+          container.attachEvent('onDOMNodeInserted', setPosition);
+        }
+    });
+
+    // Changes div height based on number of rows in dataTable
+    document.getElementById('timeline').style.height = (Math.max(70 + 41*dataTable.getDistinctValues(0).length, 210))+'px';
+
+    chart.draw(dataTable, options);
+}
+
+function returnTooltip(empresa, descricao, start_date, end_date) {
+    return '<div id="allocation-tooltip">'+
+        '<h6><b>'+empresa+' - '+descricao+'</b></h6>'+
+        '<br/><h6>Duração: <b>'+start_date+' - '+end_date+'</b></h6>'+
+        '</div>'
+}
+
+function updateTimelineRange() {
+    str_start_date = document.getElementById('timeline-start-date').value
+    str_end_date = document.getElementById('timeline-end-date').value
+
+    start_date = str2date(str_start_date);
+    end_date = str2date(str_end_date);
+
+    drawChart(axis_start_date=start_date, axis_end_date=end_date);
+}
+
+function str2date(date_str) {
+    date_arr = date_str.split('/');
+    day = Number(date_arr[0]);
+    month = Number(date_arr[1]);
+    year = Number(date_arr[2]);
+
+    return(new Date(year, month-1, day));
+}
+
+function del_allocation() {
+    var selectedItem = chart.getSelection()[0];
+    
+    if (selectedItem.row == null && selectedItem.column == null) {
+        alert("Você deve selecionar uma alocação para ser apagada.");
+    } else {
+        empresa = dataTable.getValue(selectedItem.row, 1)
+
+        var regex = /<h6><b>([^<>/]*)<\/b><\/h6>/gm;
+        var m = regex.exec(dataTable.getValue(selectedItem.row, 2))
+        var project = m[1].replace(empresa, '').replace(' - ', '')
+            
+        resource = dataTable.getValue(selectedItem.row, 0);
+        start_date = dataTable.getValue(selectedItem.row, 3);
+        start_date = start_date.getDate()+"/"+(start_date.getMonth()+1)+"/"+start_date.getFullYear();
+        end_date = dataTable.getValue(selectedItem.row, 4);
+        end_date = end_date.getDate()+"/"+(end_date.getMonth()+1)+"/"+end_date.getFullYear();
+        if (confirm("Apagar esta alocação? \n - Colaborador: "+resource+"\n - Projeto: "+project+"\n - Início: "+start_date+"\n - Término: "+end_date)) {
+            delete_allocation(resource, empresa, project, start_date, end_date);
+        }
+    }
+}
+
+function delete_allocation(resource, empresa, project, start_date, end_date) {
+
+    $.ajax({
+        url : "del_allocation/", // the endpoint
+        type : "POST", // http method
+        data : {
+            resource: resource,
+            empresa: empresa,
+            project: project,
+            start_date: start_date,
+            end_date: end_date
+        }, // data sent with the post request
+        
+
+        // handle a successful response
+        success : function(result) {
+            if (result["status"] == true){
+                location.reload();
+            }else{
+                alert("Não foi possível remover a alocação.");
+            }           
+        },
+        // handle a non-successful response
+        error : function(xhr,errmsg,err) {
+            alert("Algum erro aconteceu no servidor!\n\nDescrição:\n - Status: " + xhr.status + "\n - Mensagem: " + errmsg)
+        }
+    });
+};
+
+
+// ------------------------------------ CSFR ------------------------------------
+$(function() {
+
+
+    // This function gets cookie with a given name
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    /*
+    The functions below will create a header with csrftoken
+    */
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    function sameOrigin(url) {
+        // test that a given url is a same-origin URL
+        // url could be relative or scheme relative or absolute
+        var host = document.location.host; // host + port
+        var protocol = document.location.protocol;
+        var sr_origin = '//' + host;
+        var origin = protocol + sr_origin;
+        // Allow absolute or scheme relative URLs to same origin
+        return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+            (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+            // or any other URL that isn't scheme relative or absolute i.e relative.
+            !(/^(\/\/|http:|https:).*/.test(url));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && sameOrigin(settings.url)) {
+                // Send the token to same-origin, relative URLs only.
+                // Send the token only if the method warrants CSRF protection
+                // Using the CSRFToken value acquired earlier
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+});
+// --------------------------------------------------------------------------------------------------
+
+{% endblock %}

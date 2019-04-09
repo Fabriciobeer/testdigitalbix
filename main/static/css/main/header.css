@@ -1,0 +1,189 @@
+/* Style the header with a grey background and some padding */
+.header {
+  background-color: #33323d;
+  padding-top: 12.915px;
+  width: 100%;
+  min-width: 360px;
+  overflow:auto;
+}
+
+.header div{
+  display: inline-block;
+}
+
+.header-right{
+  float: right;
+  padding-right: 30px;
+  border-bottom-left-radius: 0px;
+  border-top-left-radius: 0px;
+  height: 54.17px;
+}
+
+.shortcuts{
+  margin-right: 15px;
+  padding-right: 15px;
+  border-right: 1px solid #3299BB;
+}
+.shortcuts a{
+  margin-right: 5px;
+}
+
+.header-right-icons{
+  margin-top: 6px;
+}
+
+.header-left{
+  float: left;
+  padding-left: 30px;
+  
+}
+.header-breadcumb{
+  float: center;
+  margin-left: 40px;
+}
+
+/* Style the logo link (notice that we set the same value of line-height and font-size to prevent the header to increase when the font gets bigger */
+
+.header-btns{
+  color: #7F7F7F;
+  border: 1px solid;
+  border-color: #7F7F7F;
+  display: block;
+  text-align: center;   
+}
+.header-btns:hover{
+  color: #3299BB; 
+}
+.intranet-header-text {
+  color: white;
+  text-align: right;
+  vertical-align: bottom;
+  font-size: smaller;
+  position: relative;
+  bottom: 8px;
+  left: 10px;
+}
+.header-options{
+  float: right;
+  height: 38.4px;
+  width: 38.4px;
+  position: relative;
+}
+.header-options img{
+ height: 38.4px; 
+}
+.HRPindeximg{
+  position:relative !important;
+  top: 4px;
+}
+.CRPindeximg{
+  position: relative;
+  left: 4px;
+}
+.pswdimg{
+  position:relative;
+  top: 3px;
+  right: 5px;
+  height: 32px !important;
+  width: 40px;
+}
+
+/* HEADER BREADCRUMB */
+ul.breadcrumb {
+  display:inline-block;
+  list-style: none;
+  background-color: #33323D;
+  border-left: solid 2px #3299BB;
+  border-bottom-left-radius: 0px;
+  border-top-left-radius: 0px;
+  height: 54.17px;
+}
+
+/* Display list items side by side */
+ul.breadcrumb li {
+  display: inline;
+  font-size: 18px;
+  padding-left:4px; 
+}
+
+/* Add a color to all links inside the list */
+ul.breadcrumb li a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Add a color on mouse-over */
+ul.breadcrumb li a:hover {
+  color: #3299BB;
+  text-decoration: none;
+}
+
+.breadcrumb-chevron{
+  fill:#3299BB;
+  position: relative;
+  top: 2px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.NEO-logo{
+  margin-bottom: 2px;
+}
+/* Add media queries for responsiveness - when the screen is 500px wide or less, stack the links on top of each other */ 
+@media screen and (max-width: 890px) {
+  
+
+  .CRPindeximg{
+    position: relative;
+    left: -4px;
+  }
+  .shortcuts{
+    margin-right: 0;
+    padding-right: 0;
+    border-right: none;
+  }
+  .shortcuts a{
+    margin-right: 5px;
+  }
+  .pswdimg{
+    position: static;
+  }
+  .header-left{
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    padding-left: 0px;
+  }
+  .header-right.shortcuts{
+    margin-right: 6px;
+  }
+  .header-right{
+    float: center;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding-right: 0px;
+  }
+  .header-breadcumb{
+    margin-left: 0px;
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+  }
+  ul.breadcrumb{
+    border-left: 0px;
+    border-bottom: solid 1px #3299BB;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  .header-options{
+    float:none;
+  }
+}

@@ -1,0 +1,169 @@
+.wrapper{
+    padding-left: 10%;
+    padding-right: 10%;
+    min-width: 320px;
+}
+
+.table-container{
+    display: inline-block;
+    padding-top: 30px;
+    width: 100%;
+}
+
+.ui-datepicker-calendar {
+    display: none;
+    }
+    
+.table-title{
+    display:inline-block;
+    color: #33323d;
+    border-bottom: 2px solid #3b49ee;
+    padding: 0px 10px 0px 10px;
+    font-weight: 400;
+    margin-top: 30px;
+    justify-self: start;
+}
+
+.table-responsive{
+    padding-top: 20px;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+/* Table rounded borders */
+.table {
+    border-spacing: 0;
+    border-collapse: separate;
+    text-align: center;
+}
+.table tr:first-child th:first-child { 
+    border-radius: 4px 0 0 0; 
+}
+
+.table tr:first-child th:last-child { 
+    border-radius: 0 4px 0 0; 
+}
+
+.table tr:last-child td:first-of-type {
+    border-radius: 0 0 0 4px;
+}
+
+.table tr:last-child td:last-child { 
+    border-radius: 0 0 4px 0; 
+}  
+
+.table tr th{
+    background-color: #33323d !important;
+    color: white !important;
+}
+
+td:first-of-type{
+    border-left: 1px solid #33323d;
+}
+th{
+    border-right: 1px solid white !important; 
+    border-left: none;
+}
+th:last-child{
+    border-right: 1px solid #33323d !important; 
+    border-left: none;
+}
+td{
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    border-right: 1px solid #33323d;
+    border-bottom: 1px solid #33323d;
+    text-align: center;
+}
+.th-acoes{
+    width: 120px;
+    min-width: 110px;
+    text-align: center;
+}
+
+/* Inputs */
+
+.table-striped tbody tr:nth-of-type(odd){
+    background-color:rgba(0, 0, 0,0.15);
+}
+
+table input,table select{
+    border:none;
+    background-color:rgba(0,0,0,0);
+    width: 100%;
+    padding: 0 0 0 0;
+}
+table input{
+    position: relative;
+    padding: 0 0 0 0;
+    text-align: center;
+}
+table select{
+    position: relative;
+    bottom: 0.5px;
+    left: -4px;
+    padding: 0 0 0 0;
+}
+table .btn{
+    background-color: rgba(0,0,0,0);
+    height: 20px;
+    padding: 0 .75rem;
+}
+
+textarea:focus, input:focus, select:focus{
+    outline-color: transparent !important;
+}
+
+.inp-data-paga:focus::-webkit-input-placeholder{
+    color: transparent;
+}
+
+.inp-valor-pago:focus::-webkit-input-placeholder{
+    color: transparent;
+}
+
+.meta-value{
+    width: 100px
+}
+
+.btn-add{
+    background-color: #33323d;
+    color: white;
+    font-weight: 600;
+    font-size: 20px;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    height: 30px;
+    line-height: 22px;
+    justify-self: end;
+    grid-column-start: 3;
+    align-self: end;
+    width: 30px;
+    margin-bottom: 5px;
+    outline: none !important;
+}
+
+.btn-add:hover{
+    cursor: pointer;
+}
+
+.btn-send{
+    margin-right: 5px;
+}
+
+.new-meta{
+    display: grid;
+    grid-template-columns: auto auto 51px;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+    padding-left: 10%;
+    padding-right: 10%; 
+}
+
+.th-mes{
+    width: 200px;
+    min-width: 85px;
+}
+
+.th-meta{
+    min-width: 150px;
+}

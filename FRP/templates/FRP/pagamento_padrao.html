@@ -1,0 +1,132 @@
+{% extends 'main/main.html' %}
+
+{% load static %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'FRP/pagamento_padrao.css' %}">
+{% endblock %}
+
+{% block base-content %}
+<div class="wrapper_all">
+    {% for empresa in empresas %}
+    <div class="wrapper_empresa">
+        <h1 class="empresa_title" onclick='showHideDiv("empresa_content_{{empresa.id}}")'>{{empresa.nome}}</h1>
+        <div id="empresa_content_{{empresa.id}}" style="display:none">
+        {% for cnpj in empresa.cnpjs.all %}
+        <h2 class="cnpj_title" id="id_cnpj_{{cnpj.cnpj}}" onclick='showHideDiv("all_cnpj_{{cnpj.id}}")'> CNPJ: {{ cnpj.cnpj }}</h2>
+        <div id="all_cnpj_{{cnpj.id}}" style="display:none">
+        <form action="/FRP/pagamento_padrao/addPagamentoPadrao/" method="POST" class="pagamento_empresas" id="form_cnpj_{{cnpj.id}}" autocomplete="off">
+            {% csrf_token %}
+            <div class="wrapper_empresa_padrao grid_wrapper" id="grid_cnpj_{{cnpj.id}}">
+                <input type="hidden" name="cnpj" value="{{cnpj.id}}">
+                {% for padrao in cnpj.padraoparcela_set.all %}
+                <input type="hidden" name="padrao_id" value="{{padrao.id}}">
+                    <div class="field">
+                        <input type="text" name="n_meses" min="0" required value="{{padrao.meses_pos_emissao}}">
+                        <label for="n_meses">Meses Após Emissão</label>
+                    </div>
+                    <div class="field">
+                        <input type="text" name="percentual" min="0" max="100" step="0.01" required value="{{padrao.porcentual_a_pagar|floatformat:2}}">
+                        <label for="percentual">Percentual</label>
+                    </div>
+                    <div class="field btn_remove_save">
+                        <a class="my_btn btn_remove_save" href="/FRP/pagamento_padrao/deletaPadrao/?pk={{padrao.id}}">X</a>
+                    </div>
+                {% endfor %}
+            </div>  
+        </form>
+        <div class="grid_add_save_btn">
+                <button class="my_btn btn_add", onclick='addPagamento("{{cnpj.id}}");'>+</p>
+                <button class="my_btn btn_submit" form="form_cnpj_{{cnpj.id}}" type="submit">Salvar</button>
+        </div>
+        </div>
+        {% endfor %}
+        </div>
+    </div>
+    {% endfor%}
+</div>
+{% endblock %}
+
+{% block childscript %}
+
+$(".octicon").mouseenter(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+$(".octicon").mouseleave(function(e){
+    $(this).toggleClass("octicon-blue");
+});
+
+function showHideDiv(id){
+    element_style = document.getElementById(id).style;
+    if(element_style.display == "none") {
+        element_style.display="block";
+    } else {
+        element_style.display="none";
+    }
+}
+
+function remove_padrao(){
+    $(this).prev().remove();
+    $(this).prev().remove();
+    $(this).prev().remove();
+    $(this).remove();
+}
+
+function addPagamento(id){
+    
+    var btn_remove_padrao = document.createElement("button");
+    btn_remove_padrao.type = "button";
+    btn_remove_padrao.onclick = remove_padrao;
+    btn_remove_padrao.className = "my_btn btn_remove_save";
+    btn_remove_padrao.appendChild(document.createTextNode("X"));
+
+    var div1 = document.createElement("div");    
+    div1.className = "field";
+    var label1 = document.createElement("label");
+    label1.appendChild(document.createTextNode("Meses Após Emissão"));
+    var input_number = document.createElement("input");
+    input_number.type = "number";
+    input_number.min = "0";
+    input_number.className = "";
+    input_number.name = "n_meses";
+    input_number.required = true;
+    div1.appendChild(input_number);
+    div1.appendChild(label1);
+
+    var div2 = document.createElement("div");    
+    div2.className = "field"; 
+    var label2 = document.createElement("label");
+    label2.appendChild(document.createTextNode("Percentual"));
+    var input_porcentual = document.createElement("input");
+    input_porcentual.type = "text";
+    input_porcentual.className = "";
+    input_porcentual.name = "percentual";
+    input_porcentual.required = true;
+    div2.appendChild(input_porcentual);
+    div2.appendChild(label2);
+
+    var input_cnpj = document.createElement("input");
+    input_cnpj.type = "hidden";
+    input_cnpj.className = "padrao-procentual-pagar input-padrao";
+    input_cnpj.name = "cnpj";
+    input_cnpj.value = id;
+
+    var form = document.getElementById('grid_cnpj_'+id);
+    if(form == null){
+        form = document.getElementById('form_cnpj_'+id);
+        var div5 = document.createElement("div");    
+        div5.className = "wrapper_empresa_padrao grid_wrapper";
+        div5.id = 'grid_cnpj_'+id;
+        div5.appendChild(input_cnpj);
+        div5.appendChild(div1);
+        div5.appendChild(div2);
+        div5.appendChild(btn_remove_padrao);
+        form.appendChild(div5); 
+    } else {   
+        form.appendChild(div1);
+        form.appendChild(div2);
+        form.appendChild(btn_remove_padrao);   
+    }
+}
+{% endblock %}

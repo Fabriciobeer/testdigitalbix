@@ -1,0 +1,72 @@
+﻿{% extends 'main/main.html' %}
+
+{% load static %}
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/login/login.css' %}">
+{% endblock %}
+
+{% block base-content %}
+<div class="container">
+    <div class="login-panel">
+        <div class="login-panel-heading">
+            <h2 id="click" class="form-signin-heading">Bem-vindo!</h2>
+            <h5 class="form-signin-heading">Por favor, insira suas credenciais</h4>
+        </div>
+        <div class="form-wrapper">
+            <form action="/auth/login/" method="post" id="login-form" autocomplete="off" class="form-signin">
+            {% csrf_token %}
+                <div class="group">      
+                    <input autocomplete="off" id="inputName" type="text" name="inputName" required>
+                    <span class="highlight right"></span>
+                    <span class="bar"></span>
+                    <label>Nome de usuário</label>
+                </div>
+                    
+                <div class="group">      
+                    <input id="inputPass" autocomplete="new-password" type="password" name="inputPassword" required>
+                    <span class="highlight"></span>
+                    <span class="bar"></span>
+                    <label>Senha</label>
+                </div>
+                <button class="btn" form="login-form" type="submit" id="submit">Login</button>  
+            </form>
+            <a onclick="rec_pass_valid()" class="link-forgot-pass">Esqueci minha senha</a>
+            <form id="forgot_pass_form" action="/auth/rec_pass/" method="POST">
+            {% csrf_token %}
+                <input id="forgot_pass_name" name="inputName" hidden>
+            </form> 
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block childscript %}
+    function inputChange(data) {
+        data.control.setValue(data.$event.target.value);
+    }
+    window.onload = function(){
+        {% if errorlog %}
+            var log = "";
+            {% for l in errorlog %}
+                log += "{{l}}" + "\n";
+            {% endfor %}
+        
+            alert(log);
+        {% endif %}
+    };
+    
+    function rec_pass_valid(){
+        aux = $("#inputName").val()
+        if (aux == ""){
+            alert("Insira o e-mail ou login do usuário que deseja recuperar a senha")
+        }else{   
+            $("#forgot_pass_name").val(aux)
+            $("#forgot_pass_form").submit()
+        }
+    }        
+
+{% endblock %}
+
+
+

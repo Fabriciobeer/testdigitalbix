@@ -1,0 +1,442 @@
+.wrapper{
+    padding-left: 15%;
+    padding-right: 15%;
+    min-width: 320px;
+    overflow: auto;
+}
+
+.table-container{
+    display: inline-block;
+    padding-top: 30px;
+    width: 100%;
+}
+
+select{
+    height: 30px;
+}
+
+.grid-container{
+    display: grid;
+    grid-template-columns: 110px auto 110px auto;
+    grid-column-gap: 5px;
+    grid-row-gap: 10px;
+}
+
+.grid-container-crp{
+    display: grid;
+    grid-template-columns: auto 130px 50% ;
+    grid-column-gap: 5px;
+    grid-row-gap: 10px;
+}
+
+
+.field{
+    text-align: -webkit-center;
+    display: flex;
+    flex-flow: column-reverse;
+}
+
+
+/* Title */
+.table-title{
+    display:inline-block;
+    color: #33323d;
+    border-bottom: 2px solid #3b49ee;
+    padding: 0px 10px 0px 10px;
+    font-weight: 400;
+    margin-top: 30px;
+}
+
+/* TABELAS */
+    td{
+        vertical-align: middle !important;
+    }
+    .table-responsive, .form-novo{
+        padding-top: 20px;
+    }
+    /* Table rounded borders */
+    .table {
+        border-spacing: 0;
+        border-collapse: separate;
+    }
+    .table tr:first-child th:first-child { 
+        border-radius: 4px 0 0 0; 
+    }
+
+    .table tr:first-child th:last-child { 
+        border-radius: 0 4px 0 0; 
+    }
+
+    .table tr:last-child td:first-of-type {
+        border-radius: 0 0 0 4px;
+    }
+
+    .table tr:last-child td:last-child { 
+        border-radius: 0 0 4px 0; 
+    }  
+
+    .table tr th{
+        background-color: #33323d !important;
+        color: white !important;
+    }
+
+    td:first-of-type{
+        border-left: 1px solid #33323d;
+    }
+    th{
+        border-right: 1px solid white !important; 
+        border-left: none;
+    }
+    th:last-child{
+        border-right: 1px solid #33323d !important; 
+        border-left: none;
+    }
+    td{
+        padding-top: 3px !important;
+        padding-bottom: 3px !important;
+        border-right: 1px solid #33323d;
+        border-bottom: 1px solid #33323d;
+        text-align: center;
+    }
+    .th-acoes{
+        width: 120px;
+        text-align: center;
+    }
+    .th-acao{
+        width: 60px;
+        text-align: center;
+    }
+
+    /* Inputs */
+
+    .table-striped tbody tr:nth-of-type(odd){
+        background-color:rgba(0, 0, 0,0.15);
+    }
+
+    table input:not([type="checkbox"]),table select{
+        border:none;
+        background-color:rgba(0,0,0,0);
+        width: 100%;
+        padding: 0 0 0 0;
+    }
+    table input{
+        position: relative;
+        top: 3px;
+        padding: 0 0 0 0;
+    }
+
+    table input, table select{
+        border-bottom:1px solid transparent !important;
+    }
+
+    table input:hover, table input:focus, table select:hover, table select:focus{
+        border-bottom: 1px solid #3146F2 !important;
+    }
+    table select{
+        position: relative;
+        bottom: 0.5px;
+        left: -4px;
+        padding: 0 0 0 0;
+    }
+    table .btn{
+        background-color: rgba(0,0,0,0);
+        height: 20px;
+        padding: 0 .75rem;
+    }
+
+
+/* Novo item */
+td{
+    height: 33px;
+}
+.padrao-btn{
+    display: block;
+    height: 30px;
+    margin: auto;
+    margin-bottom: 0px;
+    margin-top: 8px;
+    padding: 0px 0px;
+    background-color: #33323d;
+    color: white;
+    font-weight: 600;
+    vertical-align: top;
+    width: 20%;
+    min-width: 100px;
+}
+
+.padrao-btn:hover, .btn-sub-clicked{
+    background-color: #3146F2;
+    color: white;
+}
+
+input::placeholder, textarea::placeholder{
+    font-weight: 500;
+    color: rgb(128, 128, 128);
+}
+
+#btn-novo{
+    float: right;
+}
+
+#btn-novo-crp{
+    grid-column-start: 3;
+    grid-row-start: 2;
+    justify-self: end;
+    margin:0 0 0 0;
+}
+
+.placeholder{
+    color:grey !important;
+}
+
+option{
+    color: black;
+}
+
+.permissao{
+    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    position: relative;
+    top: 5px;
+    height: 30px;
+    min-width: 85px;
+    margin: 0 0 0 0;
+    line-height: 26px;
+    vertical-align: middle;
+}
+
+#is-manager{
+    position: relative;
+    top: 2.575px;
+}
+
+.th-perm{
+    width: 60px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    vertical-align: middle;
+}
+@media screen and (max-width: 780px) {
+    .grid-container-crp{
+        grid-template-columns: auto 130px;
+    }
+    .grid-container{
+        grid-template-columns: 110px auto; 
+        grid-row-gap: 65px;
+    }
+    #btn-novo-crp{
+        grid-column-start: 2;
+        right: 10px;
+        position: relative;
+        margin-top: 40px;
+    }
+    #field-razao-social{
+        grid-row-start: 2;
+        grid-column-start: 1;
+    }
+}
+@media screen and (max-width: 620px) {    
+    html{
+        overflow: scroll;
+    }
+    .wrapper{
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    .th-acoes{
+        width: 60px;
+    }
+    td{
+        font-size: 13px;
+        text-align: center;
+    }
+    table input,table select{
+        text-align: center;
+        left: 0px !important;
+        top: 0px !important;
+        bottom: 0px !important;
+    }
+    table select::-ms-expand {
+        display: none;
+    }
+    table select{
+        text-align-last: center;
+        top: 6px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+    }
+    h2{
+        font-size: 23px;
+    }
+}
+
+/* Página inativos */
+
+.td-inativo{
+    text-align: left;
+}
+
+/* Timesheet */
+.td-acoes{
+    display: inline;
+}
+
+.del-registro{
+    position: relative;
+    top: 3px;
+}
+.wrapper-acao{
+    display: inline;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+.wrapper-acao-3obj{
+    display: inline;
+}
+.checkbox-registro{
+    position: relative;
+    top: 2px;
+}
+
+
+.table-container-timesheet{
+    overflow: auto;
+    padding-top: 0px;
+}
+
+.th-data{
+    min-width: 130px;
+}
+
+
+.title-wrapper-timesheet-l{
+    display: inline;
+    float:left;
+}
+
+.title-wrapper-timesheet-r{
+    display: inline;
+    float: right;
+}
+
+#btn-timesheet{
+    display: block;
+    float: right;
+    height: 30px;
+    margin-bottom: 0px;
+    margin-top: 8px;
+    padding: 0px 0px;
+    background-color: #33323d;
+    color: white;
+    font-weight: 600;
+    vertical-align: top;
+    width: 100%;
+}
+
+#btn-timesheet:hover{
+    background-color: #3146F2;
+    color: white;
+}
+
+.table-title-timesheet{
+    width: 100%;
+    text-align: center;
+}
+
+.wrapper-timesheet{
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+
+/* EMPRESAS */
+
+#areanovo{
+    width: 40%;
+}   
+
+#btn-nova-area{
+    
+    display: block;
+    float: right;
+    height: 30px;
+    margin-bottom: 0px;
+    padding: 0px 0px;
+    background-color: #33323d;
+    color: white;
+    font-weight: 600;
+    width: 20%;
+    min-width: 100px;
+}
+
+
+#btn-nova-area:hover{
+    background-color: #3146F2;
+    color: white;
+}
+
+.select-registro{
+    background-color: white;
+}
+
+.table-striped-2{
+    margin-top: 20px;
+}
+#tabela-inativos{
+    margin-top: 20px;
+}
+#colaboradores_atuais{
+    margin-top: 20px;
+}
+
+#add-options{
+    border-left: 2px solid #3299BB;
+    margin: 13px 0 14.5px 10px;
+    padding: 5px 0;
+}
+
+.empresa-sub{
+    margin: 0px !important;
+    height: 20px !important;
+    padding: 0px 0px !important;
+    font-size: 12px !important;
+    vertical-align: top !important;
+    width: 50px !important;
+}
+
+#btn-cnpj{
+    position: relative;
+    top: -10px;
+}
+
+.blocked-button{
+    pointer-events: none;
+    background-color: grey;
+}
+
+.v-hidden{
+    display: none;
+}
+
+#outronovo{
+    position: relative;
+    margin-bottom: 0px;
+    top: -15px;
+}
+
+#outronovo ~ label{
+    top: 25px;
+}
+#outronovo:valid ~ label, #outronovo:focus ~ label{
+    top: -1px !important;
+}
+
+.outro-crp{
+    width: 90% !important;
+    margin-bottom: 3px;
+    height: 27px;
+}
+
+.cnpj-td-input{
+    margin-bottom: 3px;
+}

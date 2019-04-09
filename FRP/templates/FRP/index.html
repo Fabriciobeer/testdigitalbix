@@ -1,0 +1,41 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/index.css' %}">
+{% endblock %}
+
+{% block base-content %}
+
+<div class="timesheet row">
+    <div class ="col-lg-4 col-left">
+        <h2 class="table-title"> Pagamento Padrão </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/FRP/pagamento_padrao/">
+                <img name="HRPimg" class = "index-img HRPimg entrada" src = "{% static 'FRP/imgs/standart_payment.png' %}">
+                <img name="HRPimg" class = "index-img HRPimg saida d-none" src = "{% static 'FRP/imgs/standart_payment_hover.png' %}">
+            </a>
+        </div>
+    </div>
+    <div class ="col-lg-4 col">
+        <h2 class="table-title"> NF-e Abertas </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/FRP/nfes_abertas/">
+                <img name="CRPimg" class = "index-img CRPimg entrada" src = "{% static 'FRP/imgs/invoices.png' %}">
+                <img name="CRPimg" class = "index-img CRPimg saida d-none" src = "{% static 'FRP/imgs/invoices_hover.png' %}">
+            </a>
+        </div>
+    </div>
+    <div class ="col-lg-4 col-right">
+        <h2 class="table-title"> Metas </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/FRP/metas/">
+                <img name="FRPimg" class = "index-img FRPimg entrada" src = "{% static 'FRP/imgs/goal01.png' %}">
+                <img name="FRPimg" class = "index-img d-none FRPimg saida" src = "{% static 'FRP/imgs/goal02.png' %}">
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

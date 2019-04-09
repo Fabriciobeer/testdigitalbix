@@ -1,0 +1,75 @@
+{% extends 'main/main.html' %}
+
+{% load staticfiles %}
+{% load octicons %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/HRP/index.css' %}">
+{% endblock %}
+
+{% block base-content %}
+
+<div class="timesheet row">
+    <div class ="col-lg-4 col-left">
+        <h2 class="table-title"> Recursos Humanos </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/HRP/">
+                <img name="HRPimg" class = "index-img HRPimg entrada" src = "{% static 'imgs/HRP0.png' %}">
+                <img name="HRPimg" class = "index-img HRPimg saida d-none" src = "{% static 'imgs/HRP1.png' %}">
+            </a>
+        </div>
+    </div>
+    <div class ="col-lg-4 col">
+        <h2 class="table-title"> Clientes </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/CRP/">
+                <img name="CRPimg" class = "index-img CRPimg entrada" src = "{% static 'imgs/CRP0.png' %}">
+                <img name="CRPimg" class = "index-img CRPimg saida d-none" src = "{% static 'imgs/CRP1.png' %}">
+            </a>
+        </div>
+    </div>
+    {% if request.user.is_manager or request.user.is_financeiro %}
+    <div class ="col-lg-4 col-right">
+        <h2 class="table-title"> Financeiro </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/FRP/">
+                <img name="FRPimg" class = "index-img FRPimg entrada" src = "{% static 'imgs/FRP0.png' %}">
+                <img name="FRPimg" class = "index-img d-none FRPimg saida" src = "{% static 'imgs/FRP1.png' %}">
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class ="col-lg-4 col-right">
+        <h2 class="table-title"> FRP/Metas </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/FRP/metas/">
+                <img name="FRPimg" class = "index-img FRPimg entrada" src = "{% static 'FRP/imgs/goal01.png' %}">
+                <img name="FRPimg" class = "index-img d-none FRPimg saida" src = "{% static 'FRP/imgs/goal02.png' %}">
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!--
+    <div class ="col-lg-6 col-left">
+        <h2 class="table-title"> Recursos Humanos </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/HRP/">
+                <img name="HRPimg" class = "index-img HRPimg entrada" src = "{% static 'imgs/HRP0.png' %}">
+                <img name="HRPimg" class = "index-img HRPimg saida d-none" src = "{% static 'imgs/HRP1.png' %}">
+            </a>
+        </div>
+    </div>
+    <div class ="col-lg-6 col-right ">
+        <h2 class="table-title"> Clientes </h2>
+        <div class = "image-container">
+            <a class="index-options" href="/CRP/">
+                <img name="CRPimg" class = "index-img CRPimg entrada" src = "{% static 'imgs/CRP0.png' %}">
+                <img name="CRPimg" class = "index-img CRPimg saida d-none" src = "{% static 'imgs/CRP1.png' %}">
+            </a>
+        </div>
+    </div>
+    -->
+</div>
+
+{% endblock %}

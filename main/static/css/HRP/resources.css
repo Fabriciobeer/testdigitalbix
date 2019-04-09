@@ -1,0 +1,242 @@
+.wrapper{
+    padding-left: 15%;
+    padding-right: 15%;
+    min-width: 320px;
+    overflow: auto;
+}
+
+.table-container{
+    display: inline-block;
+    padding-top: 30px;
+    width: 100%;
+}
+
+select{
+    height: 30px;
+}
+
+.grid-container{
+    display: grid;
+    grid-template-columns: 270px auto 160px 160px;
+    grid-column-gap: 5px;
+    grid-row-gap: 10px;
+}
+
+.grid-container-crp{
+    display: grid;
+    grid-template-columns: auto 130px 50% ;
+    grid-column-gap: 5px;
+    grid-row-gap: 10px;
+}
+
+
+.field{
+    text-align: -webkit-center;
+    display: flex;
+    flex-flow: column-reverse;
+}
+
+/* Title */
+.table-title{
+    display:inline-block;
+    color: #33323d;
+    border-bottom: 2px solid #3b49ee;
+    padding: 0px 10px 0px 10px;
+    font-weight: 400;
+}
+
+/* TABELAS */
+td{
+    vertical-align: middle !important;
+}
+.table-responsive {
+    padding-top: 20px;
+}
+/* Table rounded borders */
+.table {
+    border-spacing: 0;
+    border-collapse: separate;
+}
+.table tr:first-child th:first-child { 
+    border-radius: 4px 0 0 0; 
+}
+
+.table tr:first-child th:last-child { 
+    border-radius: 0 4px 0 0; 
+}
+
+.table tr:last-child td:first-of-type {
+    border-radius: 0 0 0 4px;
+}
+
+.table tr:last-child td:last-child { 
+    border-radius: 0 0 4px 0; 
+}  
+
+.table tr th{
+    background-color: #33323d !important;
+    color: white !important;
+}
+
+td:first-of-type{
+    border-left: 1px solid #33323d;
+}
+th{
+    border-right: 1px solid white !important; 
+    border-left: none;
+}
+th:last-child{
+    border-right: 1px solid #33323d !important; 
+    border-left: none;
+}
+td{
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    border-right: 1px solid #33323d;
+    border-bottom: 1px solid #33323d;
+    text-align: center;
+}
+.th-date{
+    min-width: 90px;
+    width: 160px;
+    text-align: center;
+}
+
+.th-resource{
+    max-width: 240px;
+}
+
+/* Novo item */
+td{
+    height: 33px;
+}
+.padrao-btn{
+    display: block;
+    height: 30px;
+    margin: auto;
+    margin-bottom: 0px;
+    margin-top: 8px;
+    padding: 0px 0px;
+    background-color: #33323d;
+    color: white;
+    font-weight: 600;
+    vertical-align: top;
+    width: 20%;
+    min-width: 100px;
+}
+#start-date, #end-date{
+    text-align: center;
+}
+input:required {
+    box-shadow: none;
+}
+
+/* ALOCAÇÃO */
+#btn-add-allocation{
+    float: right;
+}
+#btn-del-allocation{
+    float:right;
+    background-color: #33323d;
+    margin: auto;
+    margin-top: 10px;
+    padding-top: 0 0;
+}
+#btn-del-allocation:hover, #btn-add-allocation:hover{
+    background-color: #3146F2;
+    color: white;
+}
+.wrapper .octicon {
+    fill: white;
+    height: 30px;
+    width: 30px;
+    padding: 0 0;
+}
+
+/* DatePicker */
+.ui-datepicker {
+    margin: 0px;
+    padding: 0px !important;
+    border: 3px solid #33323d !important;
+}
+
+.ui-datepicker-title{
+    
+    color: white;
+}
+
+.ui-datepicker-header{
+    background-color: #33323d !important;
+    border: 3px solid #33323d !important;
+    border-bottom-right-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;
+    border-top-left-radius: 0px !important;
+    position: relative;
+    bottom: 1px;
+}
+
+.ui-state-active{
+    border: 1px solid #c5c5c5 !important;
+    background: #f6f6f6 !important;
+    font-weight: normal !important;
+    color: #454545 !important;
+}
+
+td.ui-dia-selecionado a{
+    border: 1px solid #c5c5c5 !important;
+    background: #33323d !important;
+    color: white !important;
+}
+
+.ui-dia-selecionado{
+    border: 0px solid #c5c5c5 !important;
+    
+}
+
+#timeline{
+    /* height: 600px; */
+    padding-top: 20px;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+
+#allocation-tooltip{
+    padding: 20px 20px 20px 20px;
+    background-color: #fdfdfd;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    width: auto;
+    height: auto;
+    position: fixed !important;
+}
+
+#timeline-range {
+    grid-template-columns: auto 160px 160px;
+    margin-top: 30px;
+}
+
+#title {
+    align-self: start;
+}
+
+@media screen and (max-width: 780px) {
+    #t-grid {
+        grid-template-columns: 100%;
+    }
+    #t-grid select, #t-grid input {
+        margin-bottom: 0;
+    }
+    #btn-add-allocation{
+        grid-column-start: 2;
+        right: 10px;
+        position: relative;
+        margin-top: 40px;
+    }
+    #timeline-range {
+        grid-template-columns: 100%;
+    }
+}
+
+#title{
+    text-align: left;
+}
